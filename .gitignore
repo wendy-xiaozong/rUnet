@@ -1,3 +1,6 @@
+.flake8
+pyproject.toml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -25,6 +28,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+tmp.jpg
 
 # Lightning /research  
 test_tube_exp/
@@ -40,6 +44,11 @@ tests/save_dir
 tests/tests_tt_dir/
 processed/
 raw/
+checkpoint/
+log/
+temp_model.ckpt
+lr_find_temp.ckpt
+pt/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -118,10 +127,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+mypy.ini
 
 # IDEs
 .idea
 .vscode
+isort.cfg
 
 # seed project
 lightning_logs/
