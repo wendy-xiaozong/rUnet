@@ -36,32 +36,16 @@ class LitModel(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx: int):
-        images, labels = batch
-        
+        inputs, targets = batch
+
+        print(f"inputs shape:{inputs.shape}")
+        print(f"targets shape:{targets.shape}")
 
     def validation_step(self, batch, batch_idx: int):
-        images, labels = batch
+        inputs, targets = batch
 
-        print(f"images: {images.shape}")
-        print(f"labels: {labels.shape}")
-
-        # logits = self(image)
-        # logits = torch.squeeze(logits, dim=1)
-        # loss = self.bce_loss(input=logits, target=labels)
-        # y_prob = self.sigmoid(logits)
-        # y_prob[y_prob >= self.hparams.threshold] = 1
-        # y_prob[y_prob < self.hparams.threshold] = 0
-        # y_pred_onehot = F.one_hot(y_prob.long(), num_classes=2)
-        # y_pred_onehot = y_pred_onehot.permute(0, 3, 1, 2).float()
-        # dice = dice_score(
-        #     pred=y_pred_onehot,
-        #     target=labels,
-        #     bg=False,
-        # )
-        # # if self.current_epoch > 10 and dice < 0.81:
-        # #     log_all_info(self, image, labels, y_prob, dice)
-        # self.log("val_loss", loss, sync_dist=True)
-        # self.log("val_dice", dice, sync_dist=True)
+        print(f"inputs shape:{inputs.shape}")
+        print(f"targets shape:{targets.shape}")
 
     def configure_optimizers(
         self,

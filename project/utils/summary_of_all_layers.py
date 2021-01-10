@@ -6,10 +6,10 @@ from model.unet.unet import UNet
 import torch
 
 
-class NewModel(pl.LightningModule):
+class Model(pl.LightningModule):
     def __init__(self):
         super().__init__()
-        self.example_input_array = torch.zeros(1, 1, 96, 96, 96)
+        self.example_input_array = torch.zeros(1, 1, 170, 200, 150)
 
         self.out_classes = 139
         self.deepth = 3
@@ -17,20 +17,16 @@ class NewModel(pl.LightningModule):
         self.module_type = "Unet"
         self.downsampling_type = "max"
         self.normalization = "Batch"
-        # self.unet = UNet(
-        #     in_channels=4,
-        #     out_classes=4,
-        #     num_encoding_blocks=2,
-        #     out_channels_first_layer=8,
-        #     kernal_size=3,
-        #     normalization=self.normalization,
-        #     module_type="Unet",
-        #     downsampling_type=self.downsampling_type,
-        #     dropout=0,
-        #     use_classifier=False,
-        # )
-
-        self.myModel = Module(in_channels=1, out_channels=self.out_classes, dimensions=3)
+        self.model = UNet(
+            in_channels=1,
+            num_encoding_blocks=self.hparams.deepth,
+            out_channels_first_layer=self.hparams.out_channels_first_layer,
+            kernal_size=self.hparams.kernel_size,
+            normalization=self.hparams.normalization,
+            module_type=self.hparams.model,
+            downsampling_type=self.hparams.downsampling_type,
+            dropout=0,
+        )
 
     def forward(self, x):
         # return self.unet(x)

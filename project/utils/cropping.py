@@ -11,10 +11,9 @@ def create_nonzero_mask(data: np.ndarray) -> np.ndarray:
     from scipy.ndimage import binary_fill_holes
 
     assert len(data.shape) == 3, "data must have shape (C, X, Y)"
-    nonzero_mask = np.zeros(data.shape[1:], dtype=bool)
-    for c in range(data.shape[0]):
-        this_mask = data[c] != 0
-        nonzero_mask = nonzero_mask | this_mask
+    nonzero_mask = np.zeros(data.shape, dtype=bool)
+    this_mask = data > 0
+    nonzero_mask = nonzero_mask | this_mask
     nonzero_mask = binary_fill_holes(nonzero_mask)
     return nonzero_mask
 
@@ -38,7 +37,7 @@ def crop_to_bbox(img: np.ndarray, bbox: List[List[int]]) -> np.ndarray:
 
 def crop_to_nonzero(img: np.ndarray) -> np.ndarray:
     nonzero_mask = create_nonzero_mask(img)
-    bbox_kmeans = get_bbox_from_mask(nonzero_mask, 0)
+    bbox = get_bbox_from_mask(nonzero_mask, 0)
 
-    img = crop_to_bbox(img, bbox_kmeans)
+    img = crop_to_bbox(img, bbox)
     return img

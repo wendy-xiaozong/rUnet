@@ -4,6 +4,7 @@ from monai.transforms import (
     # Resize,
     Compose,
     ToTensor,
+    SpatialPad,
 )
 from monai.transforms.compose import Transform
 from utils.cropping import crop_to_nonzero
@@ -19,27 +20,59 @@ class Crop(Transform):
         return crop_to_nonzero(img)
 
 
-def get_preprocess(is_train: bool) -> List:
-    if is_train:
+class Unsqueeze(Transform):
+    def __init__(
+        self,
+    ) -> None:
+        pass
+
+    def __call__(self, img: np.ndarray) -> np.ndarray:
+        return np.expand_dims(img, axis=0)
+
+
+class Squeeze(Transform):
+    def __init__(
+        self,
+    ) -> None:
+        pass
+
+    def __call__(self, img: np.ndarray) -> np.ndarray:
+        return np.squeeze(img)
+
+
+def get_preprocess(is_label: bool) -> List:
+    if not is_label:
         return [
             Crop(),
             # Use this instead of ScaleIntensity because of nnUnet.
             # But I don't think this should make a lot difference
             NormalizeIntensity(nonzero=True),
             # Resize((IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE)),
+            # I really donno why I need to the unsqueeze things
+            # maybe the way I use the data augmentation is the standard way(?)
+            # but it works ¯\_(ツ)_/¯
+            Unsqueeze(),
+            SpatialPad(spatial_size=[170, 200, 150], method="symmetric", mode="constant"),
         ]
     else:
-        return [Crop()]
+        return [
+            Crop(),
+            Unsqueeze(),
+            SpatialPad(spatial_size=[170, 200, 150], method="symmetric", mode="constant"),
+        ]
 
 
-def get_train_transforms() -> Compose:
-    preprocess = get_preprocess(is_train=True)
-    train_augmentation = [
-        ToTensor(),
-    ]
+def get_train_img_transforms() -> Compose:
+    preprocess = get_preprocess(is_label=False)
+    train_augmentation = [ToTensor()]
     return Compose(preprocess + train_augmentation)
 
 
-def get_val_transforms() -> Compose:
-    preprocess = get_preprocess(is_train=False)
+def get_val_img_transforms() -> Compose:
+    preprocess = get_preprocess(is_label=False)
+    return Compose(preprocess + [ToTensor()])
+
+
+def get_label_transforms() -> Compose:
+    preprocess = get_preprocess(is_label=True)
     return Compose(preprocess + [ToTensor()])
