@@ -20,14 +20,13 @@ UPSAMPLING_MODES = (
 class Decoder(nn.Module):
     def __init__(
         self,
-        in_channels_skip_connection: int,  # 32
+        in_channels_skip_connection: int,
         dimensions: int,
         upsampling_type: str,
         num_decoding_blocks: int,
+        residual: bool,
         normalization: Optional[str],
         kernal_size: int = 5,
-        module_type: str = "Unet",
-        # preactivation: bool = False,
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
         dropout: float = 0.3,
@@ -43,16 +42,12 @@ class Decoder(nn.Module):
                 upsampling_type=upsampling_type,
                 normalization=normalization,
                 kernal_size=kernal_size,
-                module_type=module_type,
                 padding_mode=padding_mode,
                 activation=activation,
-                # dilation=self.dilation,
-                dropout=dropout,
+                residual=residual,
             )
             self.decoding_blocks.append(decoding_block)
             in_channels_skip_connection //= 2
-            # if self.dilation is not None:
-            #     self.dilation //= 2
 
     def forward(self, skip_connections, x):
         zipped = zip(reversed(skip_connections), self.decoding_blocks)
@@ -67,19 +62,15 @@ class DecodingBlock(nn.Module):
         in_channels_skip_connection: int,
         dimensions: int,
         upsampling_type: str,
+        residual: bool,
         normalization: Optional[str] = "Group",
         kernal_size: int = 5,
-        module_type: str = "Unet",
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
-        # dilation: Optional[int] = None,
-        dropout: float = 0,
-        # first_decoder_block: bool = True,
     ):
         super().__init__()
 
-        # self.residual = residual
-        self.module_type = module_type
+        self.residual = residual
 
         if upsampling_type == "conv":
             in_channels = in_channels_skip_connection
@@ -99,7 +90,6 @@ class DecodingBlock(nn.Module):
             kernal_size=kernal_size,
             padding_mode=padding_mode,
             activation=activation,
-            dropout=dropout,
         )
 
         in_channels_second = out_channels
@@ -112,13 +102,12 @@ class DecodingBlock(nn.Module):
             kernal_size=kernal_size,
             padding_mode=padding_mode,
             activation=activation,
-            dropout=dropout,
         )
 
         # print(f"first conv input channel: {in_channels_first}")
         # print(f"second conv output channel: {out_channels}")
 
-        if module_type == "ResUnet":
+        if self.residual:
             self.conv_residual = ConvolutionalBlock(
                 dimensions,
                 in_channels_first,
@@ -138,12 +127,12 @@ class DecodingBlock(nn.Module):
         # print(f"x shape: {x.shape}")
         x = torch.cat((skip_connection, x), dim=CHANNELS_DIMENSION)
 
-        if self.module_type == "ResUnet":
+        if self.residual:
             connection = self.conv_residual(x)
             x = self.conv1(x)
             x = self.conv2(x)
             x += connection
-        elif self.module_type == "Unet":
+        else:
             x = self.conv1(x)
             x = self.conv2(x)
         return x

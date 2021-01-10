@@ -9,7 +9,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn import Sigmoid, BCEWithLogitsLoss
 from monai.losses import DiceLoss
-from model.unet.unet import UNet
+from model.unet.unet import VNet
 from pytorch_lightning.metrics.functional.classification import dice_score
 from pytorch_lightning.utilities.parsing import AttributeDict
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
@@ -20,15 +20,16 @@ class LitModel(pl.LightningModule):
     def __init__(self, hparams: AttributeDict):
         super(LitModel, self).__init__()
         self.hparams = hparams
-        self.model = UNet(
+        self.model = VNet(
             in_channels=1,
-            num_encoding_blocks=self.hparams.deepth,
-            out_channels_first_layer=self.hparams.out_channels_first_layer,
-            kernal_size=self.hparams.kernel_size,
+            # num_encoding_blocks=self.hparams.deepth,
+            # out_channels_first_layer=self.hparams.out_channels_first_layer,
+            out_channels_first_layer=16,
+            # kernal_size=self.hparams.kernel_size,
+            kernal_size=5,
             normalization=self.hparams.normalization,
             module_type=self.hparams.model,
             downsampling_type=self.hparams.downsampling_type,
-            dropout=0,
         )
         self.sigmoid = Sigmoid()
 
