@@ -26,6 +26,7 @@ class UNet(nn.Module):
         residual: bool,
         padding_mode: str,
         activation: Optional[str],
+        upsampling_type: str = "conv",
         use_softmax: bool = False,
     ):
         super().__init__()
@@ -61,9 +62,9 @@ class UNet(nn.Module):
 
         conv_num_in_layer.reverse()
         self.decoder = Decoder(
-            in_channels_skip_connection,
+            in_channels_skip_connection,  # 128
             dimensions,
-            upsampling_type="conv",
+            upsampling_type=upsampling_type,
             conv_num_in_layer=conv_num_in_layer[1:],
             kernal_size=kernal_size,
             residual=residual,
@@ -72,7 +73,7 @@ class UNet(nn.Module):
             activation=activation,
         )
 
-        in_channels = out_channels_first_layer
+        in_channels = self.decoder.out_channels
         self.classifier = ConvolutionalBlock(
             dimensions,
             in_channels,
@@ -85,7 +86,6 @@ class UNet(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         skip_connections, encoding = self.encoder(x)
-        # print(f"first skip connection shape: {skip_connections[0].shape}")
         x = self.bottom_block(encoding)
         x = self.decoder(skip_connections, x)
         x = self.classifier(x)

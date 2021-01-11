@@ -32,10 +32,8 @@ class Decoder(nn.Module):
         dropout: float = 0.3,
     ):
         super().__init__()
-        upsampling_type = fix_upsampling_type(upsampling_type, dimensions)
         self.decoding_blocks = nn.ModuleList()
-        # self.dilation = initial_dilation
-        for conv_num in conv_num_in_layer:
+        for idx, conv_num in enumerate(conv_num_in_layer):
             decoding_block = DecodingBlock(
                 in_channels_skip_connection=in_channels_skip_connection,
                 dimensions=dimensions,
@@ -46,9 +44,12 @@ class Decoder(nn.Module):
                 activation=activation,
                 residual=residual,
                 conv_num=conv_num,
+                block_num=idx,
             )
             self.decoding_blocks.append(decoding_block)
             in_channels_skip_connection //= 2
+
+        self.out_channels = in_channels_skip_connection * 4
 
     def forward(self, skip_connections, x):
         zipped = zip(reversed(skip_connections), self.decoding_blocks)
@@ -65,6 +66,7 @@ class DecodingBlock(nn.Module):
         upsampling_type: str,
         residual: bool,
         conv_num: int,
+        block_num: int,
         normalization: Optional[str] = "Group",
         kernal_size: int = 5,
         padding_mode: str = "zeros",
@@ -75,14 +77,22 @@ class DecodingBlock(nn.Module):
         self.residual = residual
 
         if upsampling_type == "conv":
-            in_channels = in_channels_skip_connection * 2
-            out_channels = in_channels_skip_connection
+            if block_num == 0:
+                in_channels = in_channels_skip_connection * 2
+                out_channels = in_channels_skip_connection
+            else:
+                in_channels = in_channels_skip_connection * 4
+                out_channels = in_channels_skip_connection * 2
             self.upsample = get_conv_transpose_layer(dimensions, in_channels, out_channels)
-        else:
-            self.upsample = get_upsampling_layer(upsampling_type)
+        # else:
+        #     self.upsample = get_upsampling_layer(upsampling_type)
 
-        in_channels_first = in_channels_skip_connection * 2
-        out_channels = in_channels_skip_connection * 2
+        if block_num == 0:
+            in_channels_first = in_channels_skip_connection * 2
+            out_channels = in_channels_skip_connection * 2
+        else:
+            in_channels_first = in_channels_skip_connection * 3
+            out_channels = in_channels_skip_connection * 2
         conv_blocks = []
 
         conv_blocks.append(
@@ -97,7 +107,7 @@ class DecodingBlock(nn.Module):
             )
         )
 
-        for idx in range(conv_num - 1):
+        for _ in range(conv_num - 1):
             conv_blocks.append(
                 ConvolutionalBlock(
                     dimensions,
@@ -122,13 +132,10 @@ class DecodingBlock(nn.Module):
             )
 
     def forward(self, skip_connection, x):
-        # print(f"x input shape: {x.shape}")
-        x = self.upsample(x)  # upConvLayer
+        x = self.upsample(x)
         # print(f"x from the upsample shape: {x.shape}")
         # if self.all_size_input:
         #     x = self.crop(x, skip_connection)  # crop x according skip_connection
-        # print(f"skip_connection shape: {skip_connection.shape}")
-        # print(f"x shape: {x.shape}")
         x = torch.cat((skip_connection, x), dim=CHANNELS_DIMENSION)
 
         if self.residual:

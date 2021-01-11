@@ -17,10 +17,10 @@ class ConvolutionalBlock(nn.Module):
         super().__init__()
 
         block = nn.ModuleList()
-
         class_name = "Conv{}d".format(dimensions)
         conv_class = getattr(nn, class_name)
 
+        print(f"in channels: {in_channels}")
         conv_layer = conv_class(
             in_channels,
             out_channels,
