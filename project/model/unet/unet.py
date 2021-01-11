@@ -2,7 +2,7 @@
 
 """Main module."""
 
-from typing import Optional
+from typing import Optional, List
 import torch
 import torch.nn as nn
 from .encoding import Encoder, EncodingBlock
@@ -18,8 +18,8 @@ class UNet(nn.Module):
         in_channels: int,
         out_classes: int,
         dimensions: int,
-        num_encoding_blocks: int,
         out_channels_first_layer: int,
+        conv_num_in_layer: List[int],
         kernal_size: int,
         normalization: str,
         downsampling_type: str,
@@ -29,14 +29,13 @@ class UNet(nn.Module):
         use_softmax: bool = False,
     ):
         super().__init__()
-        depth = num_encoding_blocks
         self.use_softmax = use_softmax
 
         self.encoder = Encoder(
             in_channels=in_channels,
             out_channels_first=out_channels_first_layer,
             dimensions=dimensions,
-            num_encoding_blocks=depth,
+            conv_num_in_layer=conv_num_in_layer,
             residual=residual,
             kernal_size=kernal_size,
             normalization=normalization,
@@ -45,28 +44,27 @@ class UNet(nn.Module):
             activation=activation,
         )
 
-        # There is only one layer at the bottom of the Unet
         in_channels = self.encoder.out_channels
         in_channels_skip_connection = in_channels
-        out_channels_first = in_channels * 2
         self.bottom_block = EncodingBlock(
             in_channels=in_channels,
-            out_channels_first=out_channels_first,
-            out_channels=in_channels,
+            out_channels=in_channels * 2,
             dimensions=dimensions,
+            conv_num=conv_num_in_layer[-1],
             residual=residual,
             normalization=normalization,
             kernal_size=kernal_size,
             padding_mode=padding_mode,
             activation=activation,
+            num_block=len(conv_num_in_layer),
         )
 
-        num_decoding_blocks = depth
+        conv_num_in_layer.reverse()
         self.decoder = Decoder(
             in_channels_skip_connection,
             dimensions,
             upsampling_type="conv",
-            num_decoding_blocks=num_decoding_blocks,
+            conv_num_in_layer=conv_num_in_layer[1:],
             kernal_size=kernal_size,
             residual=residual,
             normalization=normalization,
@@ -113,7 +111,6 @@ class UNet3D(UNet):
         kwargs["dimensions"] = 3
         kwargs["num_encoding_blocks"] = 3  # 4
         kwargs["out_channels_first_layer"] = 8
-        # kwargs['normalization'] = 'batch'
         kwargs.update(user_kwargs)
         super().__init__(*args, **kwargs)
 

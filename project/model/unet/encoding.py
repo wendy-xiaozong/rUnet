@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 import torch.nn as nn
 from .conv import ConvolutionalBlock
 import torch.nn.functional as F
@@ -10,7 +10,7 @@ class Encoder(nn.Module):
         in_channels: int,
         out_channels_first: int,
         dimensions: int,
-        num_encoding_blocks: int,
+        conv_num_in_layer: List[int],
         residual: bool,
         kernal_size: int,
         normalization: str,
@@ -21,36 +21,35 @@ class Encoder(nn.Module):
         super().__init__()
 
         self.encoding_blocks = nn.ModuleList()
-        # self.dilation = initial_dilation
-        is_first_block = True
-        for i in range(num_encoding_blocks):  # 3
+        num_encoding_blocks = len(conv_num_in_layer) - 1
+        out_channels = out_channels_first
+        for idx in range(num_encoding_blocks):
             encoding_block = EncodingBlock(
-                in_channels,
-                out_channels_first,
-                out_channels=in_channels * 2,
+                in_channels=in_channels,
+                out_channels=out_channels,
                 dimensions=dimensions,
+                conv_num=conv_num_in_layer[idx],
                 residual=residual,
                 normalization=normalization,
                 kernal_size=kernal_size,
                 downsampling_type=downsampling_type,
                 padding_mode=padding_mode,
-                is_first_block=is_first_block,
                 activation=activation,
-                num_block=i,
+                num_block=idx,
             )
-            is_first_block = False
             self.encoding_blocks.append(encoding_block)
             if dimensions == 2:
-                in_channels = out_channels_first
-                out_channels_first = in_channels * 2
+                in_channels = out_channels
+                out_channels = in_channels * 2
             elif dimensions == 3:
-                in_channels = out_channels_first
-                out_channels_first = in_channels * 2
+                in_channels = out_channels
+                out_channels = in_channels * 2
 
             self.out_channels = self.encoding_blocks[-1].out_channels
 
     def forward(self, x):
         skip_connections = []
+        # nn.ModuleList need to iterate!!!!
         for encoding_block in self.encoding_blocks:
             x, skip_connnection = encoding_block(x)
             skip_connections.append(skip_connnection)
@@ -61,48 +60,53 @@ class EncodingBlock(nn.Module):
     def __init__(
         self,
         in_channels: int,
-        out_channels_first: int,
         out_channels: int,
         dimensions: int,
         residual: bool,
         normalization: Optional[str],
+        conv_num: int,
+        num_block: int,
         kernal_size: int = 5,
         downsampling_type: Optional[str] = "conv",
-        is_first_block: bool = False,
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
-        num_block: int = 0,
     ):
         super().__init__()
 
         self.num_block = num_block
         self.residual = residual
+        conv_blocks = []
 
-        self.conv1 = ConvolutionalBlock(
-            dimensions,
-            in_channels,
-            out_channels_first,
-            normalization=normalization,
-            kernal_size=kernal_size,
-            padding_mode=padding_mode,
-            activation=activation,
+        conv_blocks.append(
+            ConvolutionalBlock(
+                dimensions,
+                in_channels,
+                out_channels,
+                normalization=normalization,
+                kernal_size=kernal_size,
+                padding_mode=padding_mode,
+                activation=activation,
+            )
         )
-        # print(f"conv1: in_channels:{in_channels}, out_channels_first:{out_channels_first}")
-        out_channels_second = out_channels_first
-        self.conv2 = ConvolutionalBlock(
-            dimensions,
-            out_channels_first,
-            out_channels,
-            normalization=normalization,
-            kernal_size=kernal_size,
-            padding_mode=padding_mode,
-            activation=activation,
-        )
+
+        for idx in range(conv_num - 1):
+            conv_blocks.append(
+                ConvolutionalBlock(
+                    dimensions,
+                    in_channels=out_channels,
+                    out_channels=out_channels,
+                    normalization=normalization,
+                    kernal_size=kernal_size,
+                    padding_mode=padding_mode,
+                    activation=activation,
+                )
+            )
+
         if residual:
             self.conv_residual = ConvolutionalBlock(
                 dimensions=dimensions,
                 in_channels=in_channels,
-                out_channels=out_channels_second,
+                out_channels=out_channels,
                 kernal_size=1,
                 normalization=None,
                 activation=None,
@@ -114,20 +118,18 @@ class EncodingBlock(nn.Module):
         if downsampling_type == "max":
             self.downsample = get_downsampling_maxpooling_layer(dimensions, downsampling_type)
         elif downsampling_type == "conv":
-            self.downsample = get_downsampling_conv_layer(in_channels=out_channels_second)
+            self.downsample = get_downsampling_conv_layer(in_channels=out_channels)
 
-        # self.out_channels = self.conv2.conv_layer.out_channels
-        self.out_channels = out_channels_second
+        self.out_channels = out_channels
+        self.conv_blocks = nn.Sequential(*conv_blocks)
 
     def forward(self, x):
         if self.residual:
-            connection = self.conv_residual(x)
-            x = self.conv1(x)
-            x = self.conv2(x)
-            x += connection
+            residual_layer = self.conv_residual(x)
+            x = self.conv_blocks(x)
+            x += residual_layer
         else:
-            x = self.conv1(x)
-            x = self.conv2(x)
+            x = self.conv_blocks(x)
 
         if self.downsample is None:
             return x

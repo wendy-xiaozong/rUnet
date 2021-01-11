@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Sequence
 
 import torch
 from torch import Tensor
@@ -22,8 +22,8 @@ class Decoder(nn.Module):
         self,
         in_channels_skip_connection: int,
         dimensions: int,
+        conv_num_in_layer: Sequence[int],
         upsampling_type: str,
-        num_decoding_blocks: int,
         residual: bool,
         normalization: Optional[str],
         kernal_size: int = 5,
@@ -35,7 +35,7 @@ class Decoder(nn.Module):
         upsampling_type = fix_upsampling_type(upsampling_type, dimensions)
         self.decoding_blocks = nn.ModuleList()
         # self.dilation = initial_dilation
-        for i in range(num_decoding_blocks):
+        for conv_num in conv_num_in_layer:
             decoding_block = DecodingBlock(
                 in_channels_skip_connection=in_channels_skip_connection,
                 dimensions=dimensions,
@@ -45,6 +45,7 @@ class Decoder(nn.Module):
                 padding_mode=padding_mode,
                 activation=activation,
                 residual=residual,
+                conv_num=conv_num,
             )
             self.decoding_blocks.append(decoding_block)
             in_channels_skip_connection //= 2
@@ -63,6 +64,7 @@ class DecodingBlock(nn.Module):
         dimensions: int,
         upsampling_type: str,
         residual: bool,
+        conv_num: int,
         normalization: Optional[str] = "Group",
         kernal_size: int = 5,
         padding_mode: str = "zeros",
@@ -73,39 +75,41 @@ class DecodingBlock(nn.Module):
         self.residual = residual
 
         if upsampling_type == "conv":
-            in_channels = in_channels_skip_connection
+            in_channels = in_channels_skip_connection * 2
             out_channels = in_channels_skip_connection
             self.upsample = get_conv_transpose_layer(dimensions, in_channels, out_channels)
         else:
             self.upsample = get_upsampling_layer(upsampling_type)
 
         in_channels_first = in_channels_skip_connection * 2
-        out_channels = in_channels_skip_connection
+        out_channels = in_channels_skip_connection * 2
+        conv_blocks = []
 
-        self.conv1 = ConvolutionalBlock(
-            dimensions,
-            in_channels_first,
-            out_channels,
-            normalization=normalization,
-            kernal_size=kernal_size,
-            padding_mode=padding_mode,
-            activation=activation,
+        conv_blocks.append(
+            ConvolutionalBlock(
+                dimensions,
+                in_channels_first,
+                out_channels,
+                normalization=normalization,
+                kernal_size=kernal_size,
+                padding_mode=padding_mode,
+                activation=activation,
+            )
         )
 
-        in_channels_second = out_channels
-        out_channels = in_channels_skip_connection // 2
-        self.conv2 = ConvolutionalBlock(
-            dimensions,
-            in_channels_second,
-            out_channels,
-            normalization=normalization,
-            kernal_size=kernal_size,
-            padding_mode=padding_mode,
-            activation=activation,
-        )
-
-        # print(f"first conv input channel: {in_channels_first}")
-        # print(f"second conv output channel: {out_channels}")
+        for idx in range(conv_num - 1):
+            conv_blocks.append(
+                ConvolutionalBlock(
+                    dimensions,
+                    in_channels=out_channels,
+                    out_channels=out_channels,
+                    normalization=normalization,
+                    kernal_size=kernal_size,
+                    padding_mode=padding_mode,
+                    activation=activation,
+                )
+            )
+        self.conv_blocks = nn.Sequential(*conv_blocks)
 
         if self.residual:
             self.conv_residual = ConvolutionalBlock(
@@ -129,12 +133,10 @@ class DecodingBlock(nn.Module):
 
         if self.residual:
             connection = self.conv_residual(x)
-            x = self.conv1(x)
-            x = self.conv2(x)
+            x = self.conv_blocks(x)
             x += connection
         else:
-            x = self.conv1(x)
-            x = self.conv2(x)
+            x = self.conv_blocks(x)
         return x
 
     def crop(self, x: Tensor, skip: Tensor) -> Tensor:
