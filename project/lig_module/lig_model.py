@@ -13,7 +13,8 @@ from model.unet.unet import UNet
 from pytorch_lightning.metrics.functional.classification import dice_score
 from pytorch_lightning.utilities.parsing import AttributeDict
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
-from utils.visualize import log_all_info
+
+# from utils.visualize import log_all_info
 
 
 class LitModel(pl.LightningModule):

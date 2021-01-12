@@ -150,14 +150,6 @@ class BrainSlices:
         self.title = ["Actual Brain Tissue", "Actual Brain Parcellation", "Predicted Brain Parcellation"]
         self.shape = np.array(self.input_img.shape)
 
-        # Those use for mp4
-        self.masks = [np.ones([*self.input_img.shape], dtype=int), self.target_img, self.predict_img]
-        self.mask_video_names = ["Actual Brain Tissue", "Actual Brain Parcellation", "Predicted Brain Parcellation"]
-        self.scale_imgs = make_imgs(self.input_img)
-        self.scale_imgs = np.where(self.masks, self.scale_imgs, 0)
-        # print(f"masks shape: {self.masks.shape}")
-        # print(f"scale_imgs shape: {self.scale_imgs.shape}")
-
     def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
         return [
             (input[i // 2, ...], input[i, ...], input[i + i // 2, ...]),
@@ -355,11 +347,4 @@ def log_all_info(
 
     brainSlice.log(fig, dice_score, val_times, filename)
 
-    # mp4_path = Path(__file__).resolve().parent.parent / "mp4"
-    # if not os.path.exists(mp4_path):
-    #     os.mkdir(mp4_path)
-    #
-    # brainSlice.animate_masks(fig_title=f"epoch: {module.current_epoch}, batch: {batch_idx}, dice_score: {dice_score}",
-    #                          outfile=mp4_path / Path(
-    #                              f"epoch={module.current_epoch}_batch={batch_idx}_dice_score={dice_score}.mp4"))
     log_weights(module)
