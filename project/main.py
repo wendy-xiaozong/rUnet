@@ -23,7 +23,7 @@ def main(hparams: Namespace) -> None:
     if COMPUTECANADA:
         cur_path = Path(__file__).resolve().parent
         default_root_dir = cur_path
-        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_2D_loss:.5f}"
+        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_loss:.5f}"
         if not os.path.exists(Path(__file__).resolve().parent / "checkpoint"):
             os.mkdir(Path(__file__).resolve().parent / "checkpoint")
     else:
@@ -33,13 +33,13 @@ def main(hparams: Namespace) -> None:
         checkpoint_file = Path("./log/checkpoint")
         if not os.path.exists(checkpoint_file):
             os.mkdir(checkpoint_file)
-        checkpoint_file = checkpoint_file / "{epoch}-{val_2D_loss:.2f}"
+        checkpoint_file = checkpoint_file / "{epoch}-{val_loss:.2f}"
 
     # After training finishes, use best_model_path to retrieve the path to the best
     # checkpoint file and best_model_score to retrieve its score.
     checkpoint_callback = ModelCheckpoint(
         filepath=str(checkpoint_file),
-        monitor="val_2D_loss",
+        monitor="val_loss",
         save_top_k=3,
         verbose=True,
         mode="min",
@@ -55,7 +55,7 @@ def main(hparams: Namespace) -> None:
         checkpoint_callback=checkpoint_callback,
         callbacks=[
             LearningRateMonitor(logging_interval="epoch"),
-            EarlyStopping("val_2D_loss", patience=20, mode="min"),
+            EarlyStopping("val_loss", patience=20, mode="min"),
         ],
         # resume_from_checkpoint=str(
         #     Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file
@@ -69,10 +69,6 @@ def main(hparams: Namespace) -> None:
     model = LitModel(hparams)
     data_module = DataModule(hparams.batch_size)
     trainer.fit(model, data_module)
-
-    # Used to auto find suitable learning rate
-    # trainer = Trainer(gpus=hparams.gpus, distributed_backend="ddp", auto_lr_find=True)
-    # trainer.tune(model)
 
 
 if __name__ == "__main__":  # pragma: no cover

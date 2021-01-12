@@ -52,13 +52,13 @@ def get_preprocess(is_label: bool) -> List:
             # maybe the way I use the data augmentation is the standard way(?)
             # but it works ¯\_(ツ)_/¯
             Unsqueeze(),
-            SpatialPad(spatial_size=[170, 200, 150], method="symmetric", mode="constant"),
+            SpatialPad(spatial_size=[208, 208, 208], method="symmetric", mode="constant"),
         ]
     else:
         return [
             Crop(),
             Unsqueeze(),
-            SpatialPad(spatial_size=[170, 200, 150], method="symmetric", mode="constant"),
+            SpatialPad(spatial_size=[208, 208, 208], method="symmetric", mode="constant"),
         ]
 
 

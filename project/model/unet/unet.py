@@ -57,6 +57,7 @@ class UNet(nn.Module):
             kernal_size=kernal_size,
             padding_mode=padding_mode,
             activation=activation,
+            downsampling_type=None,
             num_block=len(conv_num_in_layer),
         )
 

@@ -131,7 +131,7 @@ class DecodingBlock(nn.Module):
                 activation=None,
             )
 
-    def forward(self, skip_connection, x):
+    def forward(self, skip_connection: Tensor, x: Tensor):
         x = self.upsample(x)
         # print(f"x from the upsample shape: {x.shape}")
         # if self.all_size_input:

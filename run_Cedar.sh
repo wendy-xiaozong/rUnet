@@ -35,26 +35,18 @@ tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C wor
 cd work
 
 GPUS=4
-RUN=6
-ENCODER_NAME=se_resnext50_32x4d
-THRESHOLD=0.3
-LEARNING_RATE=0.001
-MODEL=Unet
-BATCH_SIZE=10
-LOSS=bce
-LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/kidney_log
+BATCH_SIZE=3
+LEARNING_RATE=1e-3
+LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
 tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/kidney/7/project/main.py \
        --gpus=$GPUS \
-       --run=$RUN \
-       --loss=$LOSS \
        --batch_size=$BATCH_SIZE \
-       --encoder_name=$ENCODER_NAME \
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" \
-       --model="$MODEL" && echo "$(date +"%T"):  Finished running!"
+       --fast_dev_run && echo "$(date +"%T"):  Finished running!"
 
 #       --checkpoint_file="epoch=76-val_dice=0.43038.ckpt" \
