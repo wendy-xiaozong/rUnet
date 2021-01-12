@@ -76,7 +76,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--gpus", type=int, default=1, help="how many gpus")
     parser.add_argument("--batch_size", type=int, default=1, help="Batch size", dest="batch_size")
     parser.add_argument(
-        "--TensorBoardLogger",
+        "--tensor_board_logger",
         dest="TensorBoardLogger",
         default="/home/jq/Desktop/log",
         help="TensorBoardLogger dir",
