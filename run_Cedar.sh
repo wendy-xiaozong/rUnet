@@ -35,7 +35,7 @@ tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C wor
 cd work
 
 GPUS=4
-BATCH_SIZE=2
+BATCH_SIZE=1
 LEARNING_RATE=1e-3
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
