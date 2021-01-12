@@ -3,7 +3,7 @@
 #SBATCH --gres=gpu:v100l:4  # on Cedar
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
-#SBATCH --output=kidney-%j.out  # %N for node name, %j for jobID
+#SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
 #SBATCH --time=00-01:00      # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
