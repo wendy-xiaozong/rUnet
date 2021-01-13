@@ -27,7 +27,7 @@ class LitModel(pl.LightningModule):
             dimensions=3,
             padding_mode="zeros",
             activation="ReLU",
-            conv_num_in_layer=[1, 2, 2, 2, 3],
+            conv_num_in_layer=[1, 2, 3, 3, 3],
             residual=False,
             out_channels_first_layer=16,
             kernal_size=5,
@@ -53,7 +53,7 @@ class LitModel(pl.LightningModule):
 
         logits = self(inputs)
         # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        self.log("val_loss", loss, sync_dist=True)
+        # self.log("val_loss", loss, sync_dist=True)
 
     def configure_optimizers(
         self,

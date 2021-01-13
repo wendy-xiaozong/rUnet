@@ -19,3 +19,5 @@ if COMPUTECANADA:
     DATA_ROOT = Path(str(TMP)).resolve() / "work"
 else:
     DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
+
+IMAGESIZE = 128

@@ -1,13 +1,8 @@
 from typing import List
-from monai.transforms import (
-    NormalizeIntensity,
-    # Resize,
-    Compose,
-    ToTensor,
-    SpatialPad,
-)
+from monai.transforms import NormalizeIntensity, Resample, Compose, ToTensor, Resize, SpatialPad
 from monai.transforms.compose import Transform
 from utils.cropping import crop_to_nonzero
+from utils.const import IMAGESIZE
 
 import numpy as np
 
@@ -47,18 +42,20 @@ def get_preprocess(is_label: bool) -> List:
             # Use this instead of ScaleIntensity because of nnUnet.
             # But I don't think this should make a lot difference
             NormalizeIntensity(nonzero=True),
-            # Resize((IMAGE_SIZE, IMAGE_SIZE, IMAGE_SIZE)),
+            Crop(),
             # I really donno why I need to the unsqueeze things
             # maybe the way I use the data augmentation is the standard way(?)
             # but it works ¯\_(ツ)_/¯
             Unsqueeze(),
             SpatialPad(spatial_size=[208, 208, 208], method="symmetric", mode="constant"),
+            Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
         ]
     else:
         return [
             Crop(),
             Unsqueeze(),
             SpatialPad(spatial_size=[208, 208, 208], method="symmetric", mode="constant"),
+            Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
         ]
 
 
