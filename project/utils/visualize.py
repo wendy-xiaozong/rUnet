@@ -115,12 +115,9 @@ class BrainSlices:
             axis.set_xticks([])
             axis.set_yticks([])
 
-    def log(self, fig: Figure, dice_score: float, val_times: int, filename: Optional[str] = None) -> None:
+    def log(self, state: str, fig: Figure, loss: float, batch_idx: int) -> None:
         logger = self.lightning.logger
-        if filename is not None:
-            summary = f"Run:{self.lightning.hparams.run}-Epoch:{self.lightning.current_epoch + 1}-val_time:{val_times}-dice_score:{dice_score:0.5f}-filename:{filename}"
-        else:
-            summary = f"Run:{self.lightning.hparams.run}-Epoch:{self.lightning.current_epoch + 1}-val_time:{val_times}-dice_score:{dice_score:0.5f}"
+        summary = f"{state}-Epoch:{self.lightning.current_epoch + 1}-batch:{batch_idx}-loss:{loss:0.5f}"
         logger.experiment.add_figure(summary, fig, close=True)
         # if you want to manually intervene, look at the code at
         # https://github.com/pytorch/pytorch/blob/master/torch/utils/tensorboard/_utils.py
@@ -247,15 +244,9 @@ https://pytorch.org/docs/stable/tensorboard.html
 
 
 def log_all_info(
-    module: LightningModule,
-    img: Tensor,
-    target: Tensor,
-    preb: Tensor,
-    dice_score: float,
-    val_times: int,
-    filename: Optional[str] = None,
+    module: LightningModule, img: Tensor, target: Tensor, preb: Tensor, loss: float, batch_idx: int
 ) -> None:
     brainSlice = BrainSlices(module, img, target, preb)
     fig = brainSlice.plot()
 
-    brainSlice.log(fig, dice_score, val_times, filename)
+    brainSlice.log(fig, loss, batch_idx)
