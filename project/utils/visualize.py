@@ -244,9 +244,9 @@ https://pytorch.org/docs/stable/tensorboard.html
 
 
 def log_all_info(
-    module: LightningModule, img: Tensor, target: Tensor, preb: Tensor, loss: float, batch_idx: int
+    module: LightningModule, img: Tensor, target: Tensor, preb: Tensor, loss: float, batch_idx: int, state: str
 ) -> None:
     brainSlice = BrainSlices(module, img, target, preb)
     fig = brainSlice.plot()
 
-    brainSlice.log(fig, loss, batch_idx)
+    brainSlice.log(state, fig, loss, batch_idx)

@@ -48,7 +48,15 @@ class LitModel(pl.LightningModule):
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
-            log_all_info(module=self, img=inputs[0], target=targets[0], preb=logits[0], loss=loss, batch_idx=batch_idx)
+            log_all_info(
+                module=self,
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
+                loss=loss,
+                batch_idx=batch_idx,
+                state="train",
+            )
         self.log("train_loss", loss, sync_dist=True)
         return {"loss": loss}
 
@@ -58,7 +66,15 @@ class LitModel(pl.LightningModule):
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
-            log_all_info(module=self, img=inputs[0], target=targets[0], preb=logits[0], loss=loss, batch_idx=batch_idx)
+            log_all_info(
+                module=self,
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
+                loss=loss,
+                batch_idx=batch_idx,
+                state="val",
+            )
         self.log("val_loss", loss, sync_dist=True)
 
     def validation_epoch_end(self, validation_step_outputs):
