@@ -26,10 +26,6 @@ from pytorch_lightning.core.lightning import LightningModule
 import pandas as pd
 import matplotlib.gridspec as gridspec
 
-import sys
-
-sys.path.append("../data/")
-from data.const import colors_path
 
 """
 For TensorBoard logging usage, see:
@@ -48,7 +44,7 @@ https://www.tensorflow.org/api_docs/python/tf/summary/create_file_writer
 """
 
 
-def make_imgs(img: ndarray, imin: Any = None, imax: Any = None) -> [ndarray]:
+def make_imgs(img: ndarray, imin: Any = None, imax: Any = None) -> List[ndarray]:
     """Apply a 3D binary mask to a 1-channel, 3D ndarray `img` by creating a 3-channel
     image with masked regions shown in transparent blue."""
     imin = img.min() if imin is None else imin
@@ -63,73 +59,12 @@ def get_logger(logdir: Path) -> TensorBoardLogger:
     return TensorBoardLogger(str(logdir), name="unet")
 
 
-class ColorTable:
-    def __init__(self, colors_path: Union[str, Path]):
-        self.df = self.read_color_table(colors_path)
-
-    @staticmethod
-    def read_color_table(colors_path: Union[str, Path]):
-        df = pd.read_csv(
-            colors_path,
-            sep=" ",
-            header=None,
-            names=[
-                "Label",
-                "Name",
-                "R",
-                "G",
-                "B",
-                "A",
-            ],
-            index_col="Label",
-        )
-        return df
-
-    def get_color(self, label: int) -> Tuple[int, int, int]:
-        """
-        There must be nicer ways of doing this
-        """
-        try:
-            rgb = (
-                self.df.loc[label].R,
-                self.df.loc[label].G,
-                self.df.loc[label].B,
-            )
-        except KeyError:
-            rgb = 0, 0, 0
-        return rgb
-
-    def colorize(self, label_map: np.ndarray) -> np.ndarray:
-        rgb = np.stack(3 * [label_map], axis=-1)
-        for label in np.unique(label_map):
-            mask = label_map == label
-            rgb[mask] = self.get_color(label)
-        return rgb
-
-
-# what this function doing?
-def turn(array_2d: np.ndarray) -> np.ndarray:
-    return np.flipud(np.rot90(array_2d))
-
-
 # https://www.tensorflow.org/tensorboard/image_summaries#logging_arbitrary_image_data
 class BrainSlices:
-    def __init__(
-        self,
-        lightning: LightningModule,
-        img: Tensor,
-        target_: Tensor,
-        prediction: Tensor,
-        colors_path: Optional[Union[str, Path]] = None,
-    ):
-        # lol mypy type inference really breaks down here...
+    def __init__(self, lightning: LightningModule, img: Tensor, target_: Tensor, prediction: Tensor):
         self.lightning = lightning
         self.input_img: ndarray = img.cpu().detach().numpy().squeeze()
-        # the float value need to cast to np.unit8, for ColorTable and plot
-        if target_.is_cuda:
-            self.target_img: ndarray = target_.cpu().detach().numpy().squeeze().astype(np.uint8)
-        else:
-            self.target_img: ndarray = target_.numpy().squeeze().astype(np.uint8)
+        self.target_img: ndarray = target_.cpu().detach().numpy().squeeze().astype(np.uint8)
         self.predict_img: ndarray = prediction.cpu().detach().numpy().squeeze().astype(np.uint8)
 
         si, sj, sk = self.input_img.shape[:3]
@@ -142,12 +77,6 @@ class BrainSlices:
             self.get_slice(self.predict_img, i, j, k),
         ]
 
-        if colors_path is not None:
-            color_table = ColorTable(colors_path)
-            self.slices[1] = [color_table.colorize(s) for s in self.slices[1]]
-            self.slices[2] = [color_table.colorize(s) for s in self.slices[2]]
-
-        self.title = ["Actual Brain Tissue", "Actual Brain Parcellation", "Predicted Brain Parcellation"]
         self.shape = np.array(self.input_img.shape)
 
     def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
@@ -169,32 +98,22 @@ class BrainSlices:
             ax2 = plt.subplot(gs[i * 3 + 1])
             ax3 = plt.subplot(gs[i * 3 + 2])
             axes = ax1, ax2, ax3
-            self.plot_row(self.slices[i], axes, self.title[i], i)
+            self.plot_row(self.slices[i], axes)
 
         plt.tight_layout()
         return fig
 
-    def plot_row(
-        self,
-        slices: List,
-        axes: Tuple[Any, Any, Any],
-        title: str,
-        row_num: int,
-    ) -> None:
+    def plot_row(self, slices: List, axes: Tuple[Any, Any, Any]) -> None:
         for (slice_, axis) in zip(slices, axes):
-            imgs = [turn(img) for img in slice_]
+            imgs = [img for img in slice_]
             imgs = np.concatenate(imgs, axis=1)
-            if row_num == 0:
-                axis.imshow(imgs, cmap="bone", alpha=0.8)
-            else:
-                axis.imshow(imgs)
+
+            axis.imshow(imgs, cmap="bone", alpha=0.8)
             axis.grid(False)
             axis.invert_xaxis()
             axis.invert_yaxis()
             axis.set_xticks([])
             axis.set_yticks([])
-            if title is not None:
-                plt.gcf().suptitle(title)
 
     def log(self, fig: Figure, dice_score: float, val_times: int, filename: Optional[str] = None) -> None:
         logger = self.lightning.logger
@@ -321,11 +240,6 @@ class BrainSlices:
             pbar.close()
 
 
-def log_weights(module: LightningModule) -> None:
-    for name, param in module.named_parameters():
-        module.logger.experiment.add_histogram(name, param, global_step=module.global_step)
-
-
 """
 Actual methods on logger.experiment can be found here!!!
 https://pytorch.org/docs/stable/tensorboard.html
@@ -341,10 +255,7 @@ def log_all_info(
     val_times: int,
     filename: Optional[str] = None,
 ) -> None:
-    """Helper for decluttering training loop. Just performs all logging functions."""
-    brainSlice = BrainSlices(module, img, target, preb, colors_path=colors_path)
+    brainSlice = BrainSlices(module, img, target, preb)
     fig = brainSlice.plot()
 
     brainSlice.log(fig, dice_score, val_times, filename)
-
-    log_weights(module)

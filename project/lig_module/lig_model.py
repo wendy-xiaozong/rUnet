@@ -5,16 +5,15 @@ from typing import Any, Dict, List, Tuple, Optional
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
+import random
 import torch
 import torch.nn.functional as F
 from torch.nn import Sigmoid, MSELoss
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
-from pytorch_lightning.metrics.functional.classification import dice_score
 from pytorch_lightning.utilities.parsing import AttributeDict
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
-
-# from utils.visualize import log_all_info
+from utils.visualize import log_all_info
 
 
 class LitModel(pl.LightningModule):
@@ -36,6 +35,9 @@ class LitModel(pl.LightningModule):
         )
         # self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
+        # randomly pick one image to log
+        self.train_log_step = random.randint(1, 500)
+        self.val_log_step = random.randint(1, 100)
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -44,6 +46,9 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
+        if batch_idx == self.train_log_step:
+            log_all_info(module=self, img=inputs[0], target=targets[0], preb=logits[0])
+
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         self.log("train_loss", loss, sync_dist=True)
         return {"loss": loss}
@@ -52,8 +57,15 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
+        if batch_idx == self.train_log_step:
+            log_all_info(module=self, img=inputs[0], target=targets[0], preb=logits[0])
+
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         self.log("val_loss", loss, sync_dist=True)
+
+    def validation_epoch_end(self, validation_step_outputs):
+        self.train_log_step = random.randint(1, 500)
+        self.val_log_step = random.randint(1, 100)
 
     def configure_optimizers(
         self,
