@@ -9,7 +9,7 @@ import torch
 class Model(pl.LightningModule):
     def __init__(self):
         super().__init__()
-        self.example_input_array = torch.zeros(1, 1, 208, 208, 208)
+        self.example_input_array = torch.zeros(1, 1, 128, 128, 128)
 
         self.model = UNet(
             in_channels=1,
@@ -17,7 +17,7 @@ class Model(pl.LightningModule):
             dimensions=3,
             padding_mode="zeros",
             activation="ReLU",
-            conv_num_in_layer=[1, 2, 2, 2, 3],
+            conv_num_in_layer=[1, 2, 3, 3, 3],
             residual=False,
             out_channels_first_layer=16,
             kernal_size=5,

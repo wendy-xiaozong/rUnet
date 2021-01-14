@@ -44,16 +44,16 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
-        # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        # self.log("train_loss", loss, sync_dist=True)
-        # return {"loss": loss}
+        loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        self.log("train_loss", loss, sync_dist=True)
+        return {"loss": loss}
 
     def validation_step(self, batch, batch_idx: int):
         inputs, targets = batch
 
         logits = self(inputs)
-        # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        # self.log("val_loss", loss, sync_dist=True)
+        loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        self.log("val_loss", loss, sync_dist=True)
 
     def configure_optimizers(
         self,
