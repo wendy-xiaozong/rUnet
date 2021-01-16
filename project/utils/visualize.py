@@ -44,15 +44,13 @@ https://www.tensorflow.org/api_docs/python/tf/summary/create_file_writer
 """
 
 
-def make_imgs(img: ndarray, imin: Any = None, imax: Any = None) -> List[ndarray]:
+def make_imgs(img: ndarray, imin: Any = None, imax: Any = None) -> ndarray:
     """Apply a 3D binary mask to a 1-channel, 3D ndarray `img` by creating a 3-channel
     image with masked regions shown in transparent blue."""
     imin = img.min() if imin is None else imin
     imax = img.max() if imax is None else imax
     scaled = np.array(((img - imin) / (imax - imin)) * 255, dtype=int)  # img
-    if len(img.shape) == 3:
-        return [scaled] * 3
-    raise ValueError("Only accepts 1-channel or 3-channel images")
+    return scaled
 
 
 def get_logger(logdir: Path) -> TensorBoardLogger:
@@ -63,9 +61,9 @@ def get_logger(logdir: Path) -> TensorBoardLogger:
 class BrainSlices:
     def __init__(self, lightning: LightningModule, img: Tensor, target_: Tensor, prediction: Tensor):
         self.lightning = lightning
-        self.input_img: ndarray = img.cpu().detach().numpy().squeeze()
-        self.target_img: ndarray = target_.cpu().detach().numpy().squeeze().astype(np.uint8)
-        self.predict_img: ndarray = prediction.cpu().detach().numpy().squeeze().astype(np.uint8)
+        self.input_img: ndarray = make_imgs(img.cpu().detach().numpy().squeeze())
+        self.target_img: ndarray = make_imgs(target_.cpu().detach().numpy().squeeze().astype(np.uint8))
+        self.predict_img: ndarray = make_imgs(prediction.cpu().detach().numpy().squeeze().astype(np.uint8))
 
         si, sj, sk = self.input_img.shape[:3]
         i = si // 2

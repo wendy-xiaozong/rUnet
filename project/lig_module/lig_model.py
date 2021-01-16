@@ -36,8 +36,10 @@ class LitModel(pl.LightningModule):
         # self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
         # randomly pick one image to log
-        self.train_log_step = random.randint(1, 500)
-        self.val_log_step = random.randint(1, 100)
+        # self.train_log_step = random.randint(1, 500)
+        # self.val_log_step = random.randint(1, 100)
+        self.train_log_step = 1
+        self.val_log_step = 1
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -77,9 +79,9 @@ class LitModel(pl.LightningModule):
             )
         self.log("val_loss", loss, sync_dist=True)
 
-    def validation_epoch_end(self, validation_step_outputs):
-        self.train_log_step = random.randint(1, 500)
-        self.val_log_step = random.randint(1, 100)
+    # def validation_epoch_end(self, validation_step_outputs):
+    #     self.train_log_step = random.randint(1, 500)
+    #     self.val_log_step = random.randint(1, 100)
 
     def configure_optimizers(
         self,
