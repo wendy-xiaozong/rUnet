@@ -11,9 +11,6 @@ from matplotlib.pyplot import Axes, Figure
 from matplotlib.text import Text
 from numpy import ndarray
 import numpy as np
-from tqdm.auto import tqdm, trange
-import os
-import torch as t
 
 from collections import OrderedDict
 from numpy import ndarray
@@ -62,8 +59,8 @@ class BrainSlices:
     def __init__(self, lightning: LightningModule, img: Tensor, target_: Tensor, prediction: Tensor):
         self.lightning = lightning
         self.input_img: ndarray = make_imgs(img.cpu().detach().numpy().squeeze())
-        self.target_img: ndarray = make_imgs(target_.cpu().detach().numpy().squeeze().astype(np.uint8))
-        self.predict_img: ndarray = make_imgs(prediction.cpu().detach().numpy().squeeze().astype(np.uint8))
+        self.target_img: ndarray = make_imgs(target_.cpu().detach().numpy().squeeze())
+        self.predict_img: ndarray = make_imgs(prediction.cpu().detach().numpy().squeeze())
 
         si, sj, sk = self.input_img.shape[:3]
         i = si // 2
