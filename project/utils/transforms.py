@@ -1,5 +1,5 @@
 from typing import List
-from monai.transforms import NormalizeIntensity, Resample, Compose, ToTensor, Resize, SpatialPad
+from monai.transforms import NormalizeIntensity, Compose, ToTensor, Resize, SpatialPad
 from monai.transforms.compose import Transform
 from utils.cropping import crop_to_nonzero
 from utils.const import IMAGESIZE
@@ -46,7 +46,7 @@ def get_preprocess(is_label: bool) -> List:
             # maybe the way I use the data augmentation is the standard way(?)
             # but it works ¯\_(ツ)_/¯
             Unsqueeze(),
-            SpatialPad(spatial_size=[208, 208, 208], method="symmetric", mode="constant"),
+            SpatialPad(spatial_size=[193, 193, 193], method="symmetric", mode="constant"),
             Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
         ]
     else:
@@ -54,7 +54,7 @@ def get_preprocess(is_label: bool) -> List:
             Crop(),
             NormalizeIntensity(nonzero=True),
             Unsqueeze(),
-            SpatialPad(spatial_size=[208, 208, 208], method="symmetric", mode="constant"),
+            SpatialPad(spatial_size=[193, 193, 193], method="symmetric", mode="constant"),
             Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
         ]
 
