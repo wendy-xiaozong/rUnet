@@ -74,15 +74,15 @@ class BrainSlices:
 
         self.shape = np.array(self.input_img.shape)
 
-    # def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
-    #     return [
-    #         (input[i // 2, ...], input[i, ...], input[i + i // 2, ...]),
-    #         (input[:, j // 2, ...], input[:, j, ...], input[:, j + j // 2, ...]),
-    #         (input[:, :, k // 2, ...], input[:, :, k, ...], input[:, :, k + k // 2, ...]),
-    #     ]
-
     def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
-        return [input[i, ...], input[:, j, ...], input[:, :, k, ...]]
+        return [
+            (input[i // 2, ...], input[i, ...], input[i + i // 2, ...]),
+            (input[:, j // 2, ...], input[:, j, ...], input[:, j + j // 2, ...]),
+            (input[:, :, k // 2, ...], input[:, :, k, ...], input[:, :, k + k // 2, ...]),
+        ]
+
+    # def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
+    #     return [input[i, ...], input[:, j, ...], input[:, :, k, ...]]
 
     def plot(self) -> Figure:
         nrows, ncols = 3, 3  # one row for each slice position
@@ -106,7 +106,7 @@ class BrainSlices:
             imgs = [img for img in slice_]
             imgs = np.concatenate(imgs, axis=1)
 
-            axis.imshow(imgs, cmap="gray", alpha=0.8)
+            axis.imshow(imgs, cmap="bone", alpha=0.8)
             axis.grid(False)
             axis.invert_xaxis()
             axis.invert_yaxis()
