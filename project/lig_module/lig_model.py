@@ -83,18 +83,16 @@ class LitModel(pl.LightningModule):
     #     self.train_log_step = random.randint(1, 500)
     #     self.val_log_step = random.randint(1, 100)
 
-    def configure_optimizers(
-        self,
-    ) -> Tuple[List[Any], List[Dict]]:
+    def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
-        lr_dict = {
-            "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),
-            "monitor": "val_checkpoint_on",  # Default: val_loss
-            "reduce_on_plateau": True,
-            "interval": "epoch",
-            "frequency": 1,
-        }
-        return [optimizer], [lr_dict]
+        # lr_dict = {
+        #     "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),
+        #     "monitor": "val_checkpoint_on",  # Default: val_loss
+        #     "reduce_on_plateau": True,
+        #     "interval": "epoch",
+        #     "frequency": 1,
+        # }
+        return optimizer
 
     @staticmethod
     def add_model_specific_args(parent_parser: ArgumentParser) -> ArgumentParser:
