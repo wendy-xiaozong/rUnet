@@ -54,19 +54,16 @@ class DataModule(pl.LightningDataModule):
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
-        X_t1 = [sorted(list(DATA_ROOT.glob("**/*t1.nii.gz")))[0]] * 1000
-        y_t2 = [sorted(list(DATA_ROOT.glob("**/*t2.nii.gz")))[0]] * 1000
+        X_t1 = sorted(list(DATA_ROOT.glob("**/*t1.nii.gz")))
+        y_t2 = sorted(list(DATA_ROOT.glob("**/*t2.nii.gz")))
 
-        # random_state = random.randint(0, 100)
-        # X_train, X_val, y_train, y_val = train_test_split(X_t1, y_t2, test_size=0.2, random_state=random_state)
+        random_state = random.randint(0, 100)
+        X_train, X_val, y_train, y_val = train_test_split(X_t1, y_t2, test_size=0.2, random_state=random_state)
 
         train_transforms = get_train_img_transforms()
         val_transforms = get_val_img_transforms()
-        # self.train_dataset = BraTSDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
-        # self.val_dataset = BraTSDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
-
-        self.train_dataset = BraTSDataset(X_path=X_t1[:-4], y_path=y_t2[:-4], transform=train_transforms)
-        self.val_dataset = BraTSDataset(X_path=X_t1[-4:], y_path=y_t2[-4:], transform=val_transforms)
+        self.train_dataset = BraTSDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
+        self.val_dataset = BraTSDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")
