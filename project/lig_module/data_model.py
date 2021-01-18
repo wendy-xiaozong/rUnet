@@ -65,8 +65,8 @@ class DataModule(pl.LightningDataModule):
         # self.train_dataset = BraTSDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
         # self.val_dataset = BraTSDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
 
-        self.train_dataset = BraTSDataset(X_path=X_t1[:-1], y_path=y_t2[:-1], transform=train_transforms)
-        self.val_dataset = BraTSDataset(X_path=[X_t1[-1]], y_path=[y_t2[-1]], transform=val_transforms)
+        self.train_dataset = BraTSDataset(X_path=X_t1[:-4], y_path=y_t2[:-4], transform=train_transforms)
+        self.val_dataset = BraTSDataset(X_path=X_t1[-4:], y_path=y_t2[-4:], transform=val_transforms)
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")
