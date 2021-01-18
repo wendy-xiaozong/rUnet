@@ -74,17 +74,20 @@ class BrainSlices:
 
         self.shape = np.array(self.input_img.shape)
 
+    # def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
+    #     return [
+    #         (input[i // 2, ...], input[i, ...], input[i + i // 2, ...]),
+    #         (input[:, j // 2, ...], input[:, j, ...], input[:, j + j // 2, ...]),
+    #         (input[:, :, k // 2, ...], input[:, :, k, ...], input[:, :, k + k // 2, ...]),
+    #     ]
+
     def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
-        return [
-            (input[i // 2, ...], input[i, ...], input[i + i // 2, ...]),
-            (input[:, j // 2, ...], input[:, j, ...], input[:, j + j // 2, ...]),
-            (input[:, :, k // 2, ...], input[:, :, k, ...], input[:, :, k + k // 2, ...]),
-        ]
+        return [input[i, ...], input[:, j, ...], input[:, :, k, ...]]
 
     def plot(self) -> Figure:
         nrows, ncols = 3, 3  # one row for each slice position
 
-        fig = plt.figure(figsize=(75, 45))
+        fig = plt.figure(figsize=(10, 6))
         # need to change here
         # 160 is a random number
         gs = gridspec.GridSpec(nrows, ncols)
@@ -103,7 +106,7 @@ class BrainSlices:
             imgs = [img for img in slice_]
             imgs = np.concatenate(imgs, axis=1)
 
-            axis.imshow(imgs, cmap="bone", alpha=0.8)
+            axis.imshow(imgs, cmap="gray", alpha=0.8)
             axis.grid(False)
             axis.invert_xaxis()
             axis.invert_yaxis()
@@ -112,7 +115,7 @@ class BrainSlices:
 
     def log(self, state: str, fig: Figure, loss: float, batch_idx: int) -> None:
         logger = self.lightning.logger
-        summary = f"{state}-Epoch:{self.lightning.current_epoch + 1}-batch:{batch_idx}-loss:{loss:0.5f}"
+        summary = f"{state}-Epoch:{self.lightning.current_epoch + 1}-batch:{batch_idx}-loss:{loss:f}"
         logger.experiment.add_figure(summary, fig, close=True)
         # if you want to manually intervene, look at the code at
         # https://github.com/pytorch/pytorch/blob/master/torch/utils/tensorboard/_utils.py
