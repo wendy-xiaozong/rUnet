@@ -8,7 +8,6 @@ import random
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
-import torch
 from utils.const import DATA_ROOT
 from monai.transforms import Compose
 from utils.transforms import get_train_img_transforms, get_val_img_transforms, get_label_transforms
@@ -35,30 +34,32 @@ class BraTSDataset(Dataset, Randomizable):
     def __getitem__(self, i):
         self.randomize()
         loadnifti = LoadNifti()
-        X_t1_img, compatible_meta_t1 = loadnifti(self.X_path[i])
-        y_t2_img, compatible_meta_t2 = loadnifti(self.y_path[i])
+        X_img, compatible_meta = loadnifti(self.X_path[i])
+        y_img, compatible_meta = loadnifti(self.y_path[i])
 
         if isinstance(self.X_transform, Randomizable):
             self.X_transform.set_random_state(seed=self._seed)
             self.y_transform.set_random_state(seed=self._seed)
-        X_t1_img = apply_transform(self.X_transform, X_t1_img)
-        y_t2_img = apply_transform(self.y_transform, y_t2_img)
+        X_img = apply_transform(self.X_transform, X_img)
+        y_img = apply_transform(self.y_transform, y_img)
 
-        return X_t1_img, y_t2_img
+        return X_img, y_img
 
 
 class DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size: int):
+    def __init__(self, batch_size: int, X_image: str, y_image: str):
         super().__init__()
         self.batch_size = batch_size
+        self.X_image = X_image
+        self.y_image = y_image
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
-        X_t1 = sorted(list(DATA_ROOT.glob("**/*t1.nii.gz")))
-        y_t2 = sorted(list(DATA_ROOT.glob("**/*t2.nii.gz")))
+        X = sorted(list(DATA_ROOT.glob(f"**/*{self.X_image}")))
+        y = sorted(list(DATA_ROOT.glob(f"**/*{self.y_image}")))
 
         random_state = random.randint(0, 100)
-        X_train, X_val, y_train, y_val = train_test_split(X_t1, y_t2, test_size=0.2, random_state=random_state)
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)
 
         train_transforms = get_train_img_transforms()
         val_transforms = get_val_img_transforms()

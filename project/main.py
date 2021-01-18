@@ -23,7 +23,7 @@ def main(hparams: Namespace) -> None:
     if COMPUTECANADA:
         cur_path = Path(__file__).resolve().parent
         default_root_dir = cur_path
-        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_loss:f}"
+        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_loss:e}"
         if not os.path.exists(Path(__file__).resolve().parent / "checkpoint"):
             os.mkdir(Path(__file__).resolve().parent / "checkpoint")
     else:
@@ -33,7 +33,7 @@ def main(hparams: Namespace) -> None:
         checkpoint_file = Path("./log/checkpoint")
         if not os.path.exists(checkpoint_file):
             os.mkdir(checkpoint_file)
-        checkpoint_file = checkpoint_file / "{epoch}-{val_loss:f}"
+        checkpoint_file = checkpoint_file / "{epoch}-{val_loss:e}"
 
     # After training finishes, use best_model_path to retrieve the path to the best
     # checkpoint file and best_model_score to retrieve its score.
@@ -67,7 +67,7 @@ def main(hparams: Namespace) -> None:
     )
 
     model = LitModel(hparams)
-    data_module = DataModule(hparams.batch_size)
+    data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image)
     trainer.fit(model, data_module)
 
 
@@ -86,6 +86,8 @@ if __name__ == "__main__":  # pragma: no cover
         action="store_true",
         help="whether to run 1 train, val, test batch and program ends",
     )
+    parser.add_argument("--X_image", type=str, choices=["t1.nii.gz", "t2.nii.gz"])
+    parser.add_argument("--y_image", type=str, choices=["t1.nii.gz", "t2.nii.gz"])
     parser.add_argument("--checkpoint_file", type=str, help="resume_from_checkpoint_file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()
