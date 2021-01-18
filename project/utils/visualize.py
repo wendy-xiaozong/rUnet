@@ -115,7 +115,7 @@ class BrainSlices:
 
     def log(self, state: str, fig: Figure, loss: float, batch_idx: int) -> None:
         logger = self.lightning.logger
-        summary = f"{state}-Epoch:{self.lightning.current_epoch + 1}-batch:{batch_idx}-loss:{loss:e}"
+        summary = f"{state}-Epoch:{self.lightning.current_epoch + 1}-batch:{batch_idx}-loss:{loss:0.5e}"
         logger.experiment.add_figure(summary, fig, close=True)
         # if you want to manually intervene, look at the code at
         # https://github.com/pytorch/pytorch/blob/master/torch/utils/tensorboard/_utils.py
