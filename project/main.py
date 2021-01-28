@@ -3,6 +3,7 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
 import pytorch_lightning as pl
+from torch.utils import data
 from utils.const import COMPUTECANADA
 from lig_module.data_model import DataModule
 from lig_module.lig_model import LitModel
@@ -57,7 +58,7 @@ def main(hparams: Namespace) -> None:
             LearningRateMonitor(logging_interval="epoch"),
             EarlyStopping("val_loss", patience=20, mode="min"),
         ],
-        resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+        # resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
         max_epochs=100000,
@@ -66,7 +67,11 @@ def main(hparams: Namespace) -> None:
 
     model = LitModel(hparams)
     data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image)
-    trainer.test(model, data_module)
+    trainer.test(
+        model=model,
+        ckpt_path=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+        datamodule=data_module,
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
