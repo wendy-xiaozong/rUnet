@@ -77,3 +77,7 @@ class DataModule(pl.LightningDataModule):
     def val_dataloader(self):
         print(f"get {len(self.val_dataset)} validation 3D image!")
         return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=8)
+
+    def test_dataloader(self):
+        print(f"get {len(self.val_dataset)} validation 3D image!")
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=8)

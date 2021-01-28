@@ -1,6 +1,5 @@
-import random
-from argparse import ArgumentParser, Namespace
-from typing import Any, Dict, List, Tuple, Optional
+from argparse import ArgumentParser
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -8,12 +7,20 @@ import pytorch_lightning as pl
 import random
 import torch
 import torch.nn.functional as F
+from torch import Tensor
 from torch.nn import Sigmoid, MSELoss
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
 from pytorch_lightning.utilities.parsing import AttributeDict
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
 from utils.visualize import log_all_info
+
+
+def scale_img_to_0_255(img: np.ndarray) -> np.ndarray:
+    imin = torch.min(img)
+    imax = torch.max(img)
+    scaled = np.array(((img - imin) / (imax - imin)) * 255, dtype=int)  # img
+    return scaled
 
 
 class LitModel(pl.LightningModule):
@@ -75,11 +82,27 @@ class LitModel(pl.LightningModule):
                 batch_idx=batch_idx,
                 state="val",
             )
-        self.log("val_loss", loss, sync_dist=True, on_step=False, on_epoch=True)
+        self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
     def validation_epoch_end(self, validation_step_outputs):
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
+
+    def test_step(self, batch, batch_idx: int):
+        inputs, targets = batch
+
+        logits = self(inputs)
+        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
+        num_non_zero = torch.count_nonzero(inputs)
+        targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
+        predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
+        print(f"inputs: {inputs}")
+        diff_tensor = torch.abs(predicts - targets)
+        diff_average = torch.sum(diff_tensor) / num_non_zero
+        return {"diff_average": diff_average}
+
+    def test_epoch_end(self, test_step_outputs):
+        print(f"test_step_outputs: {test_step_outputs}")
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)

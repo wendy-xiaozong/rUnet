@@ -50,7 +50,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --y_image="$y_image" \
        --batch_size=$BATCH_SIZE \
        --learning_rate=$LEARNING_RATE \
+       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
-#       --checkpoint_file="epoch=76-val_dice=0.43038.ckpt" \
 #       --fast_dev_run
