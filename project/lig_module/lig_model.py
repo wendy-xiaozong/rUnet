@@ -12,13 +12,13 @@ from torch.nn import Sigmoid, MSELoss
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
 from pytorch_lightning.utilities.parsing import AttributeDict
-from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from utils.visualize import log_all_info
 
 
 def scale_img_to_0_255(img: np.ndarray) -> np.ndarray:
-    imin = torch.min(img)
-    imax = torch.max(img)
+    imin = img.min()
+    imax = img.max()
     scaled = np.array(((img - imin) / (imax - imin)) * 255, dtype=int)  # img
     return scaled
 
@@ -93,12 +93,12 @@ class LitModel(pl.LightningModule):
 
         logits = self(inputs)
         inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
-        num_non_zero = torch.count_nonzero(inputs)
+        num_non_zero = np.count_nonzero(inputs)
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
         print(f"inputs: {inputs}")
-        diff_tensor = torch.abs(predicts - targets)
-        diff_average = torch.sum(diff_tensor) / num_non_zero
+        diff_tensor = np.absolute(predicts - targets)
+        diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}
 
     def test_epoch_end(self, test_step_outputs):
