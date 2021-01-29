@@ -16,9 +16,9 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from utils.visualize import log_all_info
 
 
-def scale_img_to_0_255(img: np.ndarray) -> np.ndarray:
-    imin = img.min()  # it might not be that min!!!
-    imax = img.max()
+def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> np.ndarray:
+    imin = img.min() if imin is None else imin
+    imax = img.max() if imax is None else imax
     scaled = np.array(((img - imin) * (1 / (imax - imin))) * 255, dtype="uint8")  # img
     return scaled
 
@@ -92,12 +92,12 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
-        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
+        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze(), imin=0)
         num_non_zero = np.count_nonzero(inputs)
+        print(f"targets: {targets}")
+        print(f"predicts: {logits}")
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
-        print(f"targets: {targets}")
-        print(f"predicts: {predicts}")
         print(f"num_non_zero: {num_non_zero}")
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
