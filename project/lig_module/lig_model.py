@@ -94,7 +94,7 @@ class LitModel(pl.LightningModule):
         logits = self(inputs)
         inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze(), imin=0)
         num_non_zero = np.count_nonzero(inputs)
-        print(f"before targets: {targets}")
+        print(f"before inputs: {inputs}")
         print(f"before predicts: {logits}")
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze(), imin=0)
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
