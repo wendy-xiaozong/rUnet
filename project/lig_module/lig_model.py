@@ -91,19 +91,20 @@ class LitModel(pl.LightningModule):
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
 
+        print(f"inputs: {inputs}")
         logits = self(inputs)
         inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
         num_non_zero = np.count_nonzero(inputs)
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
-        print(f"inputs: {inputs}")
-        print(f"num_non_zero: {num_non_zero}")
+        # print(f"inputs: {inputs}")
+        # print(f"num_non_zero: {num_non_zero}")
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}
 
     def test_epoch_end(self, test_step_outputs):
-        average = torch.mean(torch.stack(test_step_outputs[0]["diff_average"]), 0)
+        average = sum(test_step_outputs[0]["diff_average"]) / len(test_step_outputs[0]["diff_average"])
         print(f"average absolute error: {average}")
 
     def configure_optimizers(self):
