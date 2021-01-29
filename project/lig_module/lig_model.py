@@ -100,7 +100,7 @@ class LitModel(pl.LightningModule):
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze(), imin=0)
         print(f"num_non_zero: {num_non_zero}")
         print(f"after targets: {targets}")
-        print(f"after predicts: {logits}")
+        print(f"after predicts: {predicts}")
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}
