@@ -104,7 +104,7 @@ class LitModel(pl.LightningModule):
         return {"diff_average": diff_average}
 
     def test_epoch_end(self, test_step_outputs):
-        average = sum(test_step_outputs[0]["diff_average"]) / len(test_step_outputs[0]["diff_average"])
+        average = np.mean(test_step_outputs[0]["diff_average"])
         print(f"average absolute error: {average}")
 
     def configure_optimizers(self):
