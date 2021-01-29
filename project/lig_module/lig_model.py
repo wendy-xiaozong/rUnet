@@ -97,12 +97,14 @@ class LitModel(pl.LightningModule):
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
         print(f"inputs: {inputs}")
+        print(f"num_non_zero: {num_non_zero}")
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}
 
     def test_epoch_end(self, test_step_outputs):
-        print(f"test_step_outputs: {test_step_outputs}")
+        average = torch.mean(torch.stack(test_step_outputs[0]["diff_average"]), 0)
+        print(f"average absolute error: {average}")
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
