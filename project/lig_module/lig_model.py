@@ -40,7 +40,7 @@ class LitModel(pl.LightningModule):
             normalization="Batch",
             downsampling_type="max",
         )
-        # self.sigmoid = Sigmoid()
+        self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
         # randomly pick one image to log
         self.train_log_step = random.randint(1, 500)
