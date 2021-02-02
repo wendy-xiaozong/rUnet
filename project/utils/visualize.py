@@ -4,6 +4,7 @@ https://github.com/fepegar/miccai-educational-challenge-2019/blob/master/visuali
 """
 
 import matplotlib.pyplot as plt
+import torch
 from matplotlib import animation
 from matplotlib.colorbar import Colorbar
 from matplotlib.image import AxesImage
@@ -20,7 +21,6 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torch import Tensor
 from typing import Any, Dict, List, Tuple, Union, Optional
 from pytorch_lightning.core.lightning import LightningModule
-import pandas as pd
 import matplotlib.gridspec as gridspec
 
 
@@ -56,11 +56,15 @@ def get_logger(logdir: Path) -> TensorBoardLogger:
 
 # https://www.tensorflow.org/tensorboard/image_summaries#logging_arbitrary_image_data
 class BrainSlices:
-    def __init__(self, lightning: LightningModule, img: Tensor, target_: Tensor, prediction: Tensor):
+    def __init__(self, lightning: LightningModule, img: Tensor, target: Tensor, prediction: Tensor):
         self.lightning = lightning
-        self.input_img: ndarray = make_imgs(img.cpu().detach().numpy().squeeze())
-        self.target_img: ndarray = make_imgs(target_.cpu().detach().numpy().squeeze())
-        self.predict_img: ndarray = make_imgs(prediction.cpu().detach().numpy().squeeze())
+        self.input_img: ndarray = make_imgs(img.cpu().detach().numpy().squeeze()) if torch.is_tensor(img) else img
+        self.target_img: ndarray = (
+            make_imgs(target.cpu().detach().numpy().squeeze()) if torch.is_tensor(target) else target
+        )
+        self.predict_img: ndarray = (
+            make_imgs(prediction.cpu().detach().numpy().squeeze()) if torch.is_tensor(prediction) else prediction
+        )
 
         si, sj, sk = self.input_img.shape[:3]
         i = si // 2
@@ -242,9 +246,16 @@ https://pytorch.org/docs/stable/tensorboard.html
 
 
 def log_all_info(
-    module: LightningModule, img: Tensor, target: Tensor, preb: Tensor, loss: float, batch_idx: int, state: str
+    module: LightningModule,
+    img: Union[Tensor, ndarray],
+    target: Union[Tensor, ndarray],
+    preb: Union[Tensor, ndarray],
+    loss: float,
+    batch_idx: int,
+    state: str,
 ) -> None:
     brainSlice = BrainSlices(module, img, target, preb)
     fig = brainSlice.plot()
 
-    brainSlice.log(state, fig, loss, batch_idx)
+    fig.savefig("after scaled.png")
+    # brainSlice.log(state, fig, loss, batch_idx)

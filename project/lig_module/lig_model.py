@@ -90,17 +90,20 @@ class LitModel(pl.LightningModule):
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
-
         logits = self(inputs)
         inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze(), imin=0)
         num_non_zero = np.count_nonzero(inputs)
-        print(f"before inputs: {inputs}")
-        print(f"before predicts: {logits}")
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze(), imin=0)
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
-        print(f"num_non_zero: {num_non_zero}")
-        print(f"after targets: {targets}")
-        print(f"after predicts: {predicts}")
+        predicts -= predicts[0][0][0][0]
+        brain_mask = inputs == inputs[0][0][0][0]
+        predicts[brain_mask] = 0
+        print(f"targets: {targets}")
+        print(f"predicts: {predicts}")
+        if batch_idx == 1:
+            log_all_info(
+                module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
+            )
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}
@@ -108,6 +111,7 @@ class LitModel(pl.LightningModule):
     def test_epoch_end(self, test_step_outputs):
         average = np.mean(test_step_outputs[0]["diff_average"])
         print(f"average absolute error: {average}")
+        return average
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
