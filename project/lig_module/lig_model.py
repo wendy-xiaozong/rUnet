@@ -95,8 +95,8 @@ class LitModel(pl.LightningModule):
         num_non_zero = np.count_nonzero(inputs)
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze(), imin=0)
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
-        predicts -= predicts[0][0][0][0]
-        brain_mask = inputs == inputs[0][0][0][0]
+        predicts -= predicts[0][0][0]
+        brain_mask = inputs == inputs[0][0][0]
         predicts[brain_mask] = 0
         print(f"targets: {targets}")
         print(f"predicts: {predicts}")
