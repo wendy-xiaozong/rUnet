@@ -91,15 +91,18 @@ class LitModel(pl.LightningModule):
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
         logits = self(inputs)
-        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
+        # inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
+        inputs = inputs.cpu().detach().numpy().squeeze()
         num_non_zero = np.count_nonzero(inputs)
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
+        targets = targets.cpu().detach().numpy().squeeze()
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
-        predicts -= predicts[0][0][0]
-        brain_mask = inputs == inputs[0][0][0]
-        predicts[brain_mask] = 0
-        print(f"targets max: {targets.max()}, targets min: {targets.min()}, targets mean: {targets.mean()}")
-        print(f"predicts max: {predicts.max()}, targets min: {predicts.min()}, targets mean: {predicts.mean()}")
+        predicts = logits.cpu().detach().numpy().squeeze()
+        # predicts -= predicts[0][0][0]
+        # brain_mask = inputs == inputs[0][0][0]
+        # predicts[brain_mask] = 0
+        # print(f"targets max: {targets.max()}, targets min: {targets.min()}, targets mean: {targets.mean()}")
+        # print(f"predicts max: {predicts.max()}, targets min: {predicts.min()}, targets mean: {predicts.mean()}")
         if batch_idx == 1:
             log_all_info(
                 module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
