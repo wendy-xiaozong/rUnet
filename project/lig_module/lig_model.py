@@ -19,7 +19,7 @@ from utils.visualize import log_all_info
 def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> np.ndarray:
     imin = img.min() if imin is None else imin
     imax = img.max() if imax is None else imax
-    scaled = np.array(((img - imin) * (1 / (imax - imin))) * 255, dtype="uint8")  # img
+    scaled = np.array(((img - imin) * (1 / (imax - imin))) * 255, dtype="uint8")
     return scaled
 
 
@@ -99,7 +99,7 @@ class LitModel(pl.LightningModule):
         brain_mask = inputs == inputs[0][0][0]
         predicts[brain_mask] = 0
         print(f"targets max: {targets.max()}, targets min: {targets.min()}, targets mean: {targets.mean()}")
-        print(f"predicts max: {predicts.max()}, targets min: {targets.min()}, targets mean: {targets.mean()}")
+        print(f"predicts max: {predicts.max()}, targets min: {predicts.min()}, targets mean: {predicts.mean()}")
         if batch_idx == 1:
             log_all_info(
                 module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
