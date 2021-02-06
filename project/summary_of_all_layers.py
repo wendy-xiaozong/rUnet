@@ -29,15 +29,15 @@ class Model(pl.LightningModule):
         return self.model(x)
 
 
-class HighResNetModel(pl.LightningModule):
-    def __init__(self):
-        super().__init__()
-        self.example_input_array = torch.zeros(1, 1, 96, 96, 96)
+# class HighResNetModel(pl.LightningModule):
+#     def __init__(self):
+#         super().__init__()
+#         self.example_input_array = torch.zeros(1, 1, 96, 96, 96)
 
-        self.unet = HighResNet(in_channels=1, out_channels=139, dimensions=3)
+#         self.unet = HighResNet(in_channels=1, out_channels=139, dimensions=3)
 
-    def forward(self, x):
-        return self.unet(x)
+#     def forward(self, x):
+#         return self.unet(x)
 
 
 if __name__ == "__main__":

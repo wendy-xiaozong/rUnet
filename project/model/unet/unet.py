@@ -9,8 +9,6 @@ from .encoding import Encoder, EncodingBlock
 from .decoding import Decoder
 from .conv import ConvolutionalBlock
 
-# I might need to try 2d data
-
 
 class UNet(nn.Module):
     def __init__(
@@ -27,10 +25,10 @@ class UNet(nn.Module):
         padding_mode: str,
         activation: Optional[str],
         upsampling_type: str = "conv",
-        use_softmax: bool = False,
+        use_sigmoid: bool = True,
     ):
         super().__init__()
-        self.use_softmax = use_softmax
+        self.use_sigmoid = use_sigmoid
 
         self.encoder = Encoder(
             in_channels=in_channels,
@@ -83,15 +81,15 @@ class UNet(nn.Module):
             activation=None,
             normalization=None,
         )
-        self.softmax = nn.Softmax(dim=1)
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         skip_connections, encoding = self.encoder(x)
         x = self.bottom_block(encoding)
         x = self.decoder(skip_connections, x)
         x = self.classifier(x)
-        if self.use_softmax:
-            return self.softmax(x)
+        if self.use_sigmoid:
+            return self.sigmoid(x)
         else:
             return x
 

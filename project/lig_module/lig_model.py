@@ -8,7 +8,7 @@ import random
 import torch
 import torch.nn.functional as F
 from torch import Tensor
-from torch.nn import Sigmoid, MSELoss
+from torch.nn import Sigmoid, MSELoss, Softmax
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
 from pytorch_lightning.utilities.parsing import AttributeDict
@@ -39,6 +39,7 @@ class LitModel(pl.LightningModule):
             kernal_size=5,
             normalization="Batch",
             downsampling_type="max",
+            use_sigmoid=True,
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
@@ -49,17 +50,21 @@ class LitModel(pl.LightningModule):
     def forward(self, x: Any) -> Any:
         return self.model(x)
 
+    def logit(self, x: torch.Tensor) -> torch.Tensor:
+        return torch.log(x / (1 - x))
+
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
 
         logits = self(inputs)
+        targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
             log_all_info(
                 module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
+                img=self.logit(inputs[0]),
+                target=self.logit(targets[0]),
+                preb=self.logit(logits[0]),
                 loss=loss,
                 batch_idx=batch_idx,
                 state="train",
@@ -71,13 +76,14 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
+        targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
             log_all_info(
                 module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
+                img=self.logit(inputs[0]),
+                target=self.logit(targets[0]),
+                preb=self.logit(logits[0]),
                 loss=loss,
                 batch_idx=batch_idx,
                 state="val",
@@ -91,18 +97,14 @@ class LitModel(pl.LightningModule):
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
         logits = self(inputs)
-        # inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
-        inputs = inputs.cpu().detach().numpy().squeeze()
+
+        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
         num_non_zero = np.count_nonzero(inputs)
         targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
-        targets = targets.cpu().detach().numpy().squeeze()
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
-        predicts = logits.cpu().detach().numpy().squeeze()
-        # predicts -= predicts[0][0][0]
-        # brain_mask = inputs == inputs[0][0][0]
-        # predicts[brain_mask] = 0
-        # print(f"targets max: {targets.max()}, targets min: {targets.min()}, targets mean: {targets.mean()}")
-        # print(f"predicts max: {predicts.max()}, targets min: {predicts.min()}, targets mean: {predicts.mean()}")
+        predicts -= predicts[0][0][0]
+        brain_mask = inputs == inputs[0][0][0]
+        predicts[brain_mask] = 0
         if batch_idx == 1:
             log_all_info(
                 module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
