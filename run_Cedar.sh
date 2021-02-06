@@ -36,15 +36,15 @@ cd work
 
 GPUS=4
 BATCH_SIZE=3
-X_image=t1.nii.gz
-y_image=t2.nii.gz
+X_image=t2.nii.gz
+y_image=t1.nii.gz
 LEARNING_RATE=1e-3
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/2/project/main.py \
        --gpus=$GPUS \
        --batch_size=$BATCH_SIZE \
        --learning_rate=$LEARNING_RATE \
