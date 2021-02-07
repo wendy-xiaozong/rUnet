@@ -47,6 +47,8 @@ echo "$(date +"%T"):  start running model!"
 tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/2/project/main.py \
        --gpus=$GPUS \
        --batch_size=$BATCH_SIZE \
+       --X_image="$X_image" \
+       --y_image="$y_image" \
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
