@@ -62,9 +62,9 @@ class LitModel(pl.LightningModule):
         if batch_idx == self.train_log_step:
             log_all_info(
                 module=self,
-                img=self.logit(inputs[0]),
-                target=self.logit(targets[0]),
-                preb=self.logit(logits[0]),
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
                 loss=loss,
                 batch_idx=batch_idx,
                 state="train",
@@ -81,9 +81,9 @@ class LitModel(pl.LightningModule):
         if batch_idx == self.train_log_step:
             log_all_info(
                 module=self,
-                img=self.logit(inputs[0]),
-                target=self.logit(targets[0]),
-                preb=self.logit(logits[0]),
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
                 loss=loss,
                 batch_idx=batch_idx,
                 state="val",
