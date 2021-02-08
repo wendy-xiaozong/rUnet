@@ -23,12 +23,12 @@ def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> n
     return scaled
 
 
-class LitModel(pl.LightningModule):
+class LitModel_Diffusion(pl.LightningModule):
     def __init__(self, hparams: AttributeDict):
-        super(LitModel, self).__init__()
+        super(LitModel_Diffusion, self).__init__()
         self.hparams = hparams
         self.model = UNet(
-            in_channels=1,
+            in_channels=288,
             out_classes=1,
             dimensions=3,
             padding_mode="zeros",
@@ -45,7 +45,6 @@ class LitModel(pl.LightningModule):
         self.criterion = MSELoss()
         # randomly pick one image to log
         self.train_log_step = random.randint(1, 500)
-        self.val_log_step = random.randint(1, 100)
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -92,7 +91,6 @@ class LitModel(pl.LightningModule):
 
     def validation_epoch_end(self, validation_step_outputs):
         self.train_log_step = random.randint(1, 500)
-        self.val_log_step = random.randint(1, 100)
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
@@ -133,7 +131,7 @@ class LitModel(pl.LightningModule):
     @staticmethod
     def add_model_specific_args(parent_parser: ArgumentParser) -> ArgumentParser:
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
-        parser.add_argument("--learning_rate", type=float, default=1e-2)
+        parser.add_argument("--learning_rate", type=float, default=1e-3)
         # parser.add_argument("--loss", type=str, default="BCEWL", help="Loss Function")
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")

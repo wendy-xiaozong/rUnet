@@ -35,6 +35,24 @@ class Squeeze(Transform):
         return np.squeeze(img)
 
 
+class Transpose(Transform):
+    def __init__(
+        self,
+    ) -> None:
+        pass
+
+    def __call__(self, img: np.ndarray) -> np.ndarray:
+        return img.transpose([3, 0, 1, 2])
+
+
+def get_diffusion_preprocess() -> List:
+    return [
+        NormalizeIntensity(nonzero=True),
+        Transpose(),
+        Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
+    ]
+
+
 def get_preprocess(is_label: bool) -> List:
     if not is_label:
         return [

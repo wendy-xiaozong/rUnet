@@ -6,7 +6,9 @@ import pytorch_lightning as pl
 from torch.utils import data
 from utils.const import COMPUTECANADA
 from lig_module.data_model import DataModule
+from lig_module.data_model_dti import DataModule_Diffusion
 from lig_module.lig_model import LitModel
+from lig_module.lig_model_dti import LitModel_Diffusion
 
 from pytorch_lightning import Trainer, loggers
 from pytorch_lightning.callbacks import (
@@ -65,8 +67,13 @@ def main(hparams: Namespace) -> None:
         # auto_scale_batch_size="binsearch", # for auto scaling of batch size
     )
 
-    model = LitModel(hparams)
-    data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image)
+    if hparams.task == "t1t2":
+        model = LitModel(hparams)
+        data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image)
+    elif hparams.task == "diffusion":
+        model = LitModel_Diffusion(hparams)
+        data_module = DataModule_Diffusion(hparams.batch_size)
+
     trainer.fit(model, data_module)
     # trainer.test(
     #     model=model,
@@ -92,6 +99,7 @@ if __name__ == "__main__":  # pragma: no cover
     )
     parser.add_argument("--X_image", type=str, choices=["t1.nii.gz", "t2.nii.gz"], default="t1.nii.gz")
     parser.add_argument("--y_image", type=str, choices=["t1.nii.gz", "t2.nii.gz"], default="t2.nii.gz")
+    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion"])
     parser.add_argument("--checkpoint_file", type=str, help="resume_from_checkpoint_file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()

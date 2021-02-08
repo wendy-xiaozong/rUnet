@@ -17,8 +17,11 @@ if TMP:  # running inside Compute Canada
 
 if COMPUTECANADA:
     DATA_ROOT = Path(str(TMP)).resolve() / "work"
+    DIFFUSION_INPUT = DATA_ROOT / "input"
+    DIFFUSION_LABEL = DATA_ROOT / "label"
 else:
-    # DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data" / "Diffusion"
     DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
+    # DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data" / "Diffusion"
+
 
 IMAGESIZE = 128
