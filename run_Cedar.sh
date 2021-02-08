@@ -29,14 +29,14 @@ echo -e '\n'
 cd $SLURM_TMPDIR
 mkdir work
 echo "$(date +"%T"):  Copying data"
-# tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C work && echo "$(date +"%T"):  Copied data"
-tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work && echo "$(date +"%T"):  Copied data"
+tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C work && echo "$(date +"%T"):  Copied data"
+# tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work && echo "$(date +"%T"):  Copied data"
 # cp /home/jueqi/projects/def-jlevman/jueqi/Data/Kaggle-RSNA/features.csv work/ && echo "$(date +"%T"):  Copied data"
 
 cd work
 
 GPUS=4
-BATCH_SIZE=1
+BATCH_SIZE=3
 TASK=t1t2
 X_image=t2.nii.gz
 y_image=t1.nii.gz
