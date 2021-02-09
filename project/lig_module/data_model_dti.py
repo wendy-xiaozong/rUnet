@@ -53,6 +53,8 @@ class DataModule_Diffusion(pl.LightningDataModule):
         # val_transforms = get_val_img_transforms()
         preprocess = get_diffusion_preprocess()
 
+        print(f"X path: {X}")
+        print(f"y path: {y}")
         self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
         self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
 
