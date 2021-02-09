@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 from monai import transforms
-from project.utils.transforms import get_preprocess
 from typing import List, Optional, Tuple
 
 import monai
@@ -52,7 +51,7 @@ class DataModule_Diffusion(pl.LightningDataModule):
 
         # train_transforms = get_train_img_transforms()
         # val_transforms = get_val_img_transforms()
-        preprocess = get_preprocess()
+        preprocess = get_diffusion_preprocess()
 
         self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
         self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
