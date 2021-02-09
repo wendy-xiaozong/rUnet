@@ -14,7 +14,7 @@ from utils.const import DIFFUSION_INPUT, DIFFUSION_LABEL
 from monai.transforms import Compose
 from utils.transforms import get_diffusion_preprocess
 from sklearn.model_selection import train_test_split
-from monai.transforms import LoadNifti, Randomizable, apply_transform
+from monai.transforms import LoadNifti, apply_transform
 from torch.utils.data import DataLoader, Dataset
 
 
@@ -22,7 +22,7 @@ class DiffusionDataset(Dataset):
     def __init__(self, X_path: List[str], y_path: List[str], transform: Compose):
         self.X_path = X_path
         self.y_path = y_path
-        self.transform = transforms
+        self.transform = transforms()
 
     def __len__(self):
         return int(len(self.X_path))
