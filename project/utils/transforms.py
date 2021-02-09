@@ -42,6 +42,7 @@ class Transpose(Transform):
         pass
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
+        print(f"img shape: {img.shape}")
         return img.transpose([3, 0, 1, 2])
 
 
