@@ -56,7 +56,7 @@ def get_logger(logdir: Path) -> TensorBoardLogger:
 
 # https://www.tensorflow.org/tensorboard/image_summaries#logging_arbitrary_image_data
 class BrainSlices:
-    def __init__(self, lightning: LightningModule, img: Tensor, target: Tensor, prediction: Tensor):
+    def __init__(self, lightning: LightningModule, img: Optional[Tensor], target: Tensor, prediction: Tensor):
         self.lightning = lightning
         self.input_img: ndarray = make_imgs(img.cpu().detach().numpy().squeeze()) if torch.is_tensor(img) else img
         self.target_img: ndarray = (

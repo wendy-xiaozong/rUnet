@@ -9,11 +9,10 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import Sigmoid, MSELoss, Softmax
-from monai.losses import DiceLoss
 from model.unet.unet import UNet
 from pytorch_lightning.utilities.parsing import AttributeDict
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from utils.visualize import log_all_info
+from utils.visualize_dti import log_all_info
 
 
 def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> np.ndarray:
@@ -44,7 +43,7 @@ class LitModel_Diffusion(pl.LightningModule):
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
         # randomly pick one image to log
-        self.train_log_step = random.randint(1, 500)
+        self.train_log_step = random.randint(1, 200)
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -61,7 +60,6 @@ class LitModel_Diffusion(pl.LightningModule):
         if batch_idx == self.train_log_step:
             log_all_info(
                 module=self,
-                img=inputs[0],
                 target=targets[0],
                 preb=logits[0],
                 loss=loss,
@@ -80,7 +78,6 @@ class LitModel_Diffusion(pl.LightningModule):
         if batch_idx == self.train_log_step:
             log_all_info(
                 module=self,
-                img=inputs[0],
                 target=targets[0],
                 preb=logits[0],
                 loss=loss,
