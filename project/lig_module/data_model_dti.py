@@ -22,7 +22,7 @@ class DiffusionDataset(Dataset):
     def __init__(self, X_path: List[str], y_path: List[str], transform: Compose):
         self.X_path = X_path
         self.y_path = y_path
-        self.transform = transforms()
+        self.transform = transform
 
     def __len__(self):
         return int(len(self.X_path))
