@@ -33,7 +33,8 @@ class DiffusionDataset(Dataset):
         y_img, compatible_meta = loadnifti(self.y_path[i])
 
         X_img = apply_transform(self.transform, X_img)
-        y_img = apply_transform(self.transform, y_img)
+        print(f"X shape: {X_img.shape}")
+        # y_img = apply_transform(self.transform, y_img)
 
         return X_img, y_img
 

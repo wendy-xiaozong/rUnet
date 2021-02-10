@@ -48,7 +48,11 @@ class Transpose(Transform):
 
 def get_diffusion_preprocess() -> List:
     return Compose(
-        [NormalizeIntensity(nonzero=True), Transpose(), Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)), ToTensor()]
+        [
+            NormalizeIntensity(nonzero=True),
+            # Transpose(),
+            # Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE))
+        ]
     )
 
 

@@ -22,6 +22,8 @@ if COMPUTECANADA:
 else:
     DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
     # DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data" / "Diffusion"
+    DIFFUSION_INPUT = DATA_ROOT / "Diffusion" / "input"
+    DIFFUSION_LABEL = DATA_ROOT / "Diffusion" / "label"
 
 
 IMAGESIZE = 128
