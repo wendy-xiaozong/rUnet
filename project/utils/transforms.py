@@ -42,15 +42,15 @@ class Transpose(Transform):
         pass
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
-        print(f"img shape: {img.shape}")
-        return img.transpose([3, 0, 1, 2])
+        # print(f"img shape: {img.shape}")
+        return np.transpose(img, (3, 0, 1, 2))
 
 
 def get_diffusion_preprocess() -> List:
     return Compose(
         [
             NormalizeIntensity(nonzero=True),
-            # Transpose(),
+            Transpose(),
             # Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE))
         ]
     )
