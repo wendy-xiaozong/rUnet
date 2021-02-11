@@ -29,15 +29,15 @@ echo -e '\n'
 cd $SLURM_TMPDIR
 mkdir work
 echo "$(date +"%T"):  Copying data"
-# tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C work && echo "$(date +"%T"):  Copied data"
-tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work && echo "$(date +"%T"):  Copied data"
+tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C work && echo "$(date +"%T"):  Copied data"
+# tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work && echo "$(date +"%T"):  Copied data"
 # cp /home/jueqi/projects/def-jlevman/jueqi/Data/Kaggle-RSNA/features.csv work/ && echo "$(date +"%T"):  Copied data"
 
 cd work
 
 GPUS=4
 BATCH_SIZE=1
-TASK=diffusion   # t1t2
+TASK=t1t2   # t1t2 diffusion
 X_image=t2.nii.gz
 y_image=t1.nii.gz
 LEARNING_RATE=1e-2
@@ -53,7 +53,8 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --y_image="$y_image" \
        --task="$TASK" \
        --learning_rate=$LEARNING_RATE \
-       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
 #       --fast_dev_run
+
+#       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
