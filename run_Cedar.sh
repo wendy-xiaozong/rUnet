@@ -37,7 +37,7 @@ cd work
 
 GPUS=4
 BATCH_SIZE=1
-TASK=t1t2   # t1t2 diffusion
+TASK=diffusion   # t1t2 
 X_image=t2.nii.gz
 y_image=t1.nii.gz
 LEARNING_RATE=1e-2
@@ -56,5 +56,4 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
 #       --fast_dev_run
-
 #       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \

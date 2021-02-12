@@ -119,7 +119,7 @@ class LitModel(pl.LightningModule):
         return average
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate, weight_decay=5e-4)
         # scheduler = ReduceLROnPlateau(optimizer, threshold=1e-10)
         lr_dict = {
             "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),

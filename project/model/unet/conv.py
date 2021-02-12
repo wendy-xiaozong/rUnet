@@ -13,6 +13,7 @@ class ConvolutionalBlock(nn.Module):
         kernal_size: int = 5,
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
+        bias: bool = False,
     ):
         super().__init__()
 
