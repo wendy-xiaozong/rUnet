@@ -15,13 +15,6 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from utils.visualize_dti import log_all_info
 
 
-def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> np.ndarray:
-    imin = img.min() if imin is None else imin
-    imax = img.max() if imax is None else imax
-    scaled = np.array(((img - imin) * (1 / (imax - imin))) * 255, dtype="uint8")
-    return scaled
-
-
 class LitModel_Diffusion(pl.LightningModule):
     def __init__(self, hparams: AttributeDict):
         super(LitModel_Diffusion, self).__init__()
@@ -93,9 +86,9 @@ class LitModel_Diffusion(pl.LightningModule):
         inputs, targets = batch
         logits = self(inputs)
 
-        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
+        inputs = inputs.cpu().detach().numpy().squeeze()
         num_non_zero = np.count_nonzero(inputs)
-        targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
+        targets = targets.cpu().detach().numpy().squeeze()
         predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
         predicts -= predicts[0][0][0]
         brain_mask = inputs == inputs[0][0][0]

@@ -37,7 +37,7 @@ cd work
 
 GPUS=4
 BATCH_SIZE=1
-TASK=diffusion   # t1t2 
+TASK=t1t2   #  diffusion
 X_image=t2.nii.gz
 y_image=t1.nii.gz
 LEARNING_RATE=1e-2

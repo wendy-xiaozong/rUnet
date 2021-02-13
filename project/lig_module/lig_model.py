@@ -63,8 +63,8 @@ class LitModel(pl.LightningModule):
             log_all_info(
                 module=self,
                 img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
+                target=self.logit(targets[0]),
+                preb=self.logit(logits[0]),
                 loss=loss,
                 batch_idx=batch_idx,
                 state="train",
@@ -82,8 +82,8 @@ class LitModel(pl.LightningModule):
             log_all_info(
                 module=self,
                 img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
+                target=self.logit(targets[0]),
+                preb=self.logit(logits[0]),
                 loss=loss,
                 batch_idx=batch_idx,
                 state="val",
