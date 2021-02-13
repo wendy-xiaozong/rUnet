@@ -31,22 +31,21 @@ mkdir work
 echo "$(date +"%T"):  Copying data"
 tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C work && echo "$(date +"%T"):  Copied data"
 # tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work && echo "$(date +"%T"):  Copied data"
-# cp /home/jueqi/projects/def-jlevman/jueqi/Data/Kaggle-RSNA/features.csv work/ && echo "$(date +"%T"):  Copied data"
 
 cd work
 
 GPUS=4
 BATCH_SIZE=1
 TASK=t1t2   #  diffusion
-X_image=t2.nii.gz
-y_image=t1.nii.gz
+X_image=t1.nii.gz
+y_image=t2.nii.gz
 LEARNING_RATE=1e-2
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
        --gpus=$GPUS \
        --batch_size=$BATCH_SIZE \
        --X_image="$X_image" \
