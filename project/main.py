@@ -75,12 +75,12 @@ def main(hparams: Namespace) -> None:
         model = LitModel_Diffusion(hparams)
         data_module = DataModule_Diffusion(hparams.batch_size)
 
-    # trainer.fit(model, data_module)
-    trainer.test(
-        model=model,
-        ckpt_path=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
-        datamodule=data_module,
-    )
+    trainer.fit(model, data_module)
+    # trainer.test(
+    #     model=model,
+    #     ckpt_path=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+    #     datamodule=data_module,
+    # )
 
 
 if __name__ == "__main__":  # pragma: no cover

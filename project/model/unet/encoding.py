@@ -17,6 +17,7 @@ class Encoder(nn.Module):
         downsampling_type: str,
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
+        use_bias: bool = True,
     ):
         super().__init__()
 
@@ -36,6 +37,7 @@ class Encoder(nn.Module):
                 padding_mode=padding_mode,
                 activation=activation,
                 num_block=idx,
+                use_bias=use_bias,
             )
             self.encoding_blocks.append(encoding_block)
             if dimensions == 2:
@@ -70,6 +72,7 @@ class EncodingBlock(nn.Module):
         downsampling_type: Optional[str] = "conv",
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
+        use_bias: bool = True,
     ):
         super().__init__()
 
@@ -86,6 +89,7 @@ class EncodingBlock(nn.Module):
                 kernal_size=kernal_size,
                 padding_mode=padding_mode,
                 activation=activation,
+                use_bias=use_bias,
             )
         )
 
@@ -99,6 +103,7 @@ class EncodingBlock(nn.Module):
                     kernal_size=kernal_size,
                     padding_mode=padding_mode,
                     activation=activation,
+                    use_bias=use_bias,
                 )
             )
 

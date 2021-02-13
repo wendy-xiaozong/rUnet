@@ -29,7 +29,7 @@ class Decoder(nn.Module):
         kernal_size: int = 5,
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
-        dropout: float = 0.3,
+        use_bias: bool = True,
     ):
         super().__init__()
         self.decoding_blocks = nn.ModuleList()
@@ -45,6 +45,7 @@ class Decoder(nn.Module):
                 residual=residual,
                 conv_num=conv_num,
                 block_num=idx,
+                use_bias=use_bias,
             )
             self.decoding_blocks.append(decoding_block)
             in_channels_skip_connection //= 2
@@ -71,6 +72,7 @@ class DecodingBlock(nn.Module):
         kernal_size: int = 5,
         padding_mode: str = "zeros",
         activation: Optional[str] = "ReLU",
+        use_bias: bool = True,
     ):
         super().__init__()
 
@@ -104,6 +106,7 @@ class DecodingBlock(nn.Module):
                 kernal_size=kernal_size,
                 padding_mode=padding_mode,
                 activation=activation,
+                use_bias=use_bias,
             )
         )
 
@@ -117,6 +120,7 @@ class DecodingBlock(nn.Module):
                     kernal_size=kernal_size,
                     padding_mode=padding_mode,
                     activation=activation,
+                    use_bias=use_bias,
                 )
             )
         self.conv_blocks = nn.Sequential(*conv_blocks)

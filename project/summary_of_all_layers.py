@@ -23,6 +23,7 @@ class Model(pl.LightningModule):
             kernal_size=5,
             normalization="Batch",
             downsampling_type="max",
+            use_bias=False,
         )
 
     def forward(self, x):

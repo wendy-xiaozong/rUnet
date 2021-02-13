@@ -25,6 +25,7 @@ class UNet(nn.Module):
         padding_mode: str,
         activation: Optional[str],
         upsampling_type: str = "conv",
+        use_bias: bool = True,
         use_sigmoid: bool = True,
     ):
         super().__init__()
@@ -41,6 +42,7 @@ class UNet(nn.Module):
             downsampling_type=downsampling_type,
             padding_mode=padding_mode,
             activation=activation,
+            use_bias=use_bias,
         )
 
         in_channels = self.encoder.out_channels
@@ -57,6 +59,7 @@ class UNet(nn.Module):
             activation=activation,
             downsampling_type=None,
             num_block=len(conv_num_in_layer),
+            use_bias=use_bias,
         )
 
         conv_num_in_layer.reverse()
@@ -70,6 +73,7 @@ class UNet(nn.Module):
             normalization=normalization,
             padding_mode=padding_mode,
             activation=activation,
+            use_bias=use_bias,
         )
 
         in_channels = self.decoder.out_channels
@@ -80,6 +84,7 @@ class UNet(nn.Module):
             kernal_size=1,
             activation=None,
             normalization=None,
+            use_bias=True,
         )
         self.sigmoid = nn.Sigmoid()
 

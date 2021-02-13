@@ -37,21 +37,20 @@ cd work
 GPUS=4
 BATCH_SIZE=1
 TASK=t1t2   #  diffusion
-X_image=t1.nii.gz
-y_image=t2.nii.gz
+X_image=t2.nii.gz
+y_image=t1.nii.gz
 LEARNING_RATE=1e-2
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/2/project/main.py \
        --gpus=$GPUS \
        --batch_size=$BATCH_SIZE \
        --X_image="$X_image" \
        --y_image="$y_image" \
        --task="$TASK" \
-       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 

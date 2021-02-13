@@ -40,6 +40,7 @@ class LitModel(pl.LightningModule):
             normalization="Batch",
             downsampling_type="max",
             use_sigmoid=False,
+            use_bias=False,
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
@@ -57,7 +58,7 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
-        targets = self.sigmoid(targets)
+        # targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
             log_all_info(
@@ -76,7 +77,7 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
-        targets = self.sigmoid(targets)
+        # targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
             log_all_info(
