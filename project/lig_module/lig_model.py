@@ -39,7 +39,7 @@ class LitModel(pl.LightningModule):
             kernal_size=5,
             normalization="Batch",
             downsampling_type="max",
-            use_sigmoid=True,
+            use_sigmoid=False,
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
@@ -98,10 +98,15 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
         logits = self(inputs)
 
-        inputs = scale_img_to_0_255(inputs.cpu().detach().numpy().squeeze())
+        inputs = inputs.cpu().detach().numpy().squeeze()
         num_non_zero = np.count_nonzero(inputs)
-        targets = scale_img_to_0_255(targets.cpu().detach().numpy().squeeze())
-        predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
+        print(f"targets median: {torch.median(targets)}, mean: {torch.mean(targets)}, std: {torch.std(targets)}")
+        print(f"max: {torch.max(targets)}, min: {torch.min(targets)}")
+        print(f"logits median: {torch.median(logits)}, mean: {torch.mean(logits)}, std: {torch.std(logits)}")
+        print(f"max: {torch.max(logits)}, min: {torch.min(logits)}")
+        print(f"targets: {targets}")
+        targets = targets.cpu().detach().numpy().squeeze()
+        predicts = logits.cpu().detach().numpy().squeeze()
         predicts -= predicts[0][0][0]
         brain_mask = inputs == inputs[0][0][0]
         predicts[brain_mask] = 0

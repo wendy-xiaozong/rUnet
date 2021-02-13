@@ -51,6 +51,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --X_image="$X_image" \
        --y_image="$y_image" \
        --task="$TASK" \
+       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
