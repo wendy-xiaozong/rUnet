@@ -73,7 +73,20 @@ class LitModel(pl.LightningModule):
 
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        if batch_idx == self.train_log_step:
+        self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
+
+        # if batch_idx == self.train_log_step:
+        #     log_all_info(
+        #         module=self,
+        #         img=inputs[0],
+        #         target=targets[0],
+        #         preb=logits[0],
+        #         loss=loss,
+        #         batch_idx=batch_idx,
+        #         state="val",
+        #     )
+
+        if batch_idx == 2:
             log_all_info(
                 module=self,
                 img=inputs[0],
@@ -81,13 +94,42 @@ class LitModel(pl.LightningModule):
                 preb=logits[0],
                 loss=loss,
                 batch_idx=batch_idx,
-                state="val",
+                state="test",
             )
-        self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
+
+        inputs = inputs.cpu().detach().numpy().squeeze()
+        targets = targets.cpu().detach().numpy().squeeze()
+        predicts = logits.cpu().detach().numpy().squeeze()
+
+        brain_mask = inputs == inputs[0][0][0]
+        predicts = predicts[~brain_mask]
+        targets = targets[~brain_mask]
+
+        percents = [0.001, 0.005, 0.008, 0.01, 0.02, 0.03, 0.05, 0.07, 0.08, 0.1]
+        MAEs = []
+        for percent_1 in percents:
+            for percent_2 in percents:
+                predicts = scale_img_to_0_255(
+                    predicts, imin=np.percentile(predicts, q=percent_1), imax=np.percentile(predicts, q=100 - percent_1)
+                )
+                targets = scale_img_to_0_255(
+                    targets, imin=np.percentile(targets, q=percent_2), imax=np.percentile(targets, q=100 - percent_2)
+                )
+                diff_tensor = np.absolute(predicts - targets)
+                diff_average = np.mean(diff_tensor)
+                MAEs.append(diff_average)
+        return_dict = {}
+        for id, MAE in enumerate(MAEs):
+            return_dict[f"diff_average_{id}"] = MAE
+        return return_dict
 
     def validation_epoch_end(self, validation_step_outputs):
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
+
+        for i in range(100):
+            average = np.mean(validation_step_outputs[0][f"diff_average_{i}"])
+            print(f"average absolute error for No. {i}: {average}")
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
