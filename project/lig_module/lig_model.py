@@ -44,21 +44,16 @@ class LitModel(pl.LightningModule):
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
-        # randomly pick one image to log
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
 
-    def logit(self, x: torch.Tensor) -> torch.Tensor:
-        return torch.log(x / (1 - x))
-
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
 
         logits = self(inputs)
-        # targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
             log_all_info(
@@ -110,7 +105,6 @@ class LitModel(pl.LightningModule):
             )
 
         inputs = inputs.cpu().detach().numpy().squeeze()
-        # num_non_zero = np.count_nonzero(inputs)
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
@@ -118,24 +112,6 @@ class LitModel(pl.LightningModule):
         predicts = predicts[~brain_mask]
         targets = targets[~brain_mask]
 
-        print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
-        print(
-            f"max: {np.max(targets)}, min: {np.min(targets)}, 1%: {np.percentile(targets, q=1)}, 5%: {np.percentile(targets, q=5)}"
-        )
-        print(
-            f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
-        )
-        print(
-            f"90%: {np.percentile(targets, q=90)}, 95%: {np.percentile(targets, q=95)}, 99%: {np.percentile(targets, q=99)}"
-        )
-        print(f"logits median: {np.median(predicts)}, mean: {np.mean(predicts)}, std: {np.std(predicts)}")
-        print(f"max: {np.max(predicts)}, min: {np.min(predicts)}, 1%: {np.percentile(predicts, q=1)}")
-        print(
-            f"10%: {np.percentile(predicts, q=10)}, 20%: {np.percentile(predicts, q=20)}, 30%: {np.percentile(predicts, q=30)}"
-        )
-        print(
-            f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
-        )
         percents = [0.001, 0.005, 0.008, 0.01, 0.02, 0.03, 0.05, 0.07, 0.08, 0.1]
         MAEs = []
         for percent_1 in percents:

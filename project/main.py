@@ -60,7 +60,7 @@ def main(hparams: Namespace) -> None:
             LearningRateMonitor(logging_interval="epoch"),
             EarlyStopping("val_loss", patience=20, mode="min"),
         ],
-        resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+        # resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
         max_epochs=100000,
@@ -76,10 +76,13 @@ def main(hparams: Namespace) -> None:
         data_module = DataModule_Diffusion(hparams.batch_size)
 
     # trainer.fit(model, data_module)
+    ckpt_path = Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file
+    print(f"ckpt path: {str(ckpt_path)}")
 
+    trainer = Trainer(gpus=hparams.gpus, distributed_backend="ddp")
     trainer.test(
         model=model,
-        ckpt_path=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+        ckpt_path=str(ckpt_path),
         datamodule=data_module,
     )
 

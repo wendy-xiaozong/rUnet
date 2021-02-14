@@ -41,13 +41,13 @@ https://www.tensorflow.org/api_docs/python/tf/summary/create_file_writer
 """
 
 
-# def make_imgs(img: ndarray, imin: Any = None, imax: Any = None) -> ndarray:
-#     """Apply a 3D binary mask to a 1-channel, 3D ndarray `img` by creating a 3-channel
-#     image with masked regions shown in transparent blue."""
-#     imin = img.min() if imin is None else imin
-#     imax = img.max() if imax is None else imax
-#     scaled = np.array(((img - imin) / (imax - imin)) * 255, dtype=int)  # img
-#     return scaled
+def make_imgs(img: ndarray, imin: Any = None, imax: Any = None) -> ndarray:
+    """Apply a 3D binary mask to a 1-channel, 3D ndarray `img` by creating a 3-channel
+    image with masked regions shown in transparent blue."""
+    imin = img.min() if imin is None else imin
+    imax = img.max() if imax is None else imax
+    scaled = np.array(((img - imin) / (imax - imin)) * 255, dtype=int)  # img
+    return scaled
 
 
 def get_logger(logdir: Path) -> TensorBoardLogger:
@@ -60,7 +60,7 @@ class BrainSlices:
         self.lightning = lightning
         self.input_img: ndarray = img.cpu().detach().numpy().squeeze() if torch.is_tensor(img) else img
         self.target_img: ndarray = target.cpu().detach().numpy().squeeze() if torch.is_tensor(target) else target
-        self.predict_img: ndarray = (
+        self.predict_img: ndarray = make_imgs(
             prediction.cpu().detach().numpy().squeeze() if torch.is_tensor(prediction) else prediction
         )
 

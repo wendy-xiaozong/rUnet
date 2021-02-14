@@ -26,7 +26,7 @@ class UNet(nn.Module):
         activation: Optional[str],
         upsampling_type: str = "conv",
         use_bias: bool = True,
-        use_sigmoid: bool = True,
+        use_sigmoid: bool = False,
     ):
         super().__init__()
         self.use_sigmoid = use_sigmoid
