@@ -101,20 +101,37 @@ class LitModel(pl.LightningModule):
 
         inputs = inputs.cpu().detach().numpy().squeeze()
         num_non_zero = np.count_nonzero(inputs)
-        print(f"targets median: {torch.median(targets)}, mean: {torch.mean(targets)}, std: {torch.std(targets)}")
-        print(f"max: {torch.max(targets)}, min: {torch.min(targets)}")
-        print(f"logits median: {torch.median(logits)}, mean: {torch.mean(logits)}, std: {torch.std(logits)}")
-        print(f"max: {torch.max(logits)}, min: {torch.min(logits)}")
-        print(f"targets: {targets}")
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
+
+        print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
+        print(
+            f"max: {np.max(targets)}, min: {np.min(targets)}, 1%: {np.percentile(targets, q=1)}, 5%: {np.percentile(targets, q=5)}"
+        )
+        print(
+            f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
+        )
+        print(
+            f"90%: {np.percentile(targets, q=90)}, 95%: {np.percentile(targets, q=95)}, 99%: {np.percentile(targets, q=99)}"
+        )
+        print(f"logits median: {np.median(predicts)}, mean: {np.mean(predicts)}, std: {np.std(predicts)}")
+        print(f"max: {np.max(predicts)}, min: {np.min(predicts)}, 1%: {np.percentile(predicts, q=1)}")
+        print(
+            f"10%: {np.percentile(predicts, q=10)}, 20%: {np.percentile(predicts, q=20)}, 30%: {np.percentile(predicts, q=30)}"
+        )
+        print(
+            f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
+        )
+        print(f"targets: {targets}")
+
         predicts -= predicts[0][0][0]
         brain_mask = inputs == inputs[0][0][0]
         predicts[brain_mask] = 0
-        if batch_idx == 1:
-            log_all_info(
-                module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
-            )
+        targets[brain_mask] = 0
+        # if batch_idx == 1:
+        #     log_all_info(
+        #         module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
+        #     )
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}

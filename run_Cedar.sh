@@ -4,7 +4,7 @@
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
 #SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
-#SBATCH --time=01-00:00      # time (DD-HH:MM)
+#SBATCH --time=00-01:00      # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
 
@@ -37,21 +37,22 @@ cd work
 GPUS=4
 BATCH_SIZE=3
 TASK=t1t2   #  diffusion
-X_image=t2.nii.gz
-y_image=t1.nii.gz
+X_image=t1.nii.gz
+y_image=t2.nii.gz
 LEARNING_RATE=1e-3
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/2/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
        --gpus=$GPUS \
        --batch_size=$BATCH_SIZE \
        --X_image="$X_image" \
        --y_image="$y_image" \
        --task="$TASK" \
        --learning_rate=$LEARNING_RATE \
+       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
 #       --fast_dev_run

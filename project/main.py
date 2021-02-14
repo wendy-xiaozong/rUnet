@@ -60,7 +60,7 @@ def main(hparams: Namespace) -> None:
             LearningRateMonitor(logging_interval="epoch"),
             EarlyStopping("val_loss", patience=20, mode="min"),
         ],
-        # resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+        resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
         max_epochs=100000,
@@ -75,12 +75,13 @@ def main(hparams: Namespace) -> None:
         model = LitModel_Diffusion(hparams)
         data_module = DataModule_Diffusion(hparams.batch_size)
 
-    trainer.fit(model, data_module)
-    # trainer.test(
-    #     model=model,
-    #     ckpt_path=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
-    #     datamodule=data_module,
-    # )
+    # trainer.fit(model, data_module)
+
+    trainer.test(
+        model=model,
+        ckpt_path=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
+        datamodule=data_module,
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

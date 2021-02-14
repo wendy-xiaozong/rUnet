@@ -58,11 +58,9 @@ def get_logger(logdir: Path) -> TensorBoardLogger:
 class BrainSlices:
     def __init__(self, lightning: LightningModule, target: Tensor, prediction: Tensor):
         self.lightning = lightning
-        self.target_img: ndarray = (
-            make_imgs(target.cpu().detach().numpy().squeeze()) if torch.is_tensor(target) else target
-        )
+        self.target_img: ndarray = target.cpu().detach().numpy().squeeze() if torch.is_tensor(target) else target
         self.predict_img: ndarray = (
-            make_imgs(prediction.cpu().detach().numpy().squeeze()) if torch.is_tensor(prediction) else prediction
+            prediction.cpu().detach().numpy().squeeze() if torch.is_tensor(prediction) else prediction
         )
 
         si, sj, sk = self.target_img.shape[:3]
