@@ -64,7 +64,7 @@ def main(hparams: Namespace) -> None:
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
         # max_epochs=100000,
-        max_epochs=1,
+        max_epochs=288,
         # auto_scale_batch_size="binsearch", # for auto scaling of batch size
     )
 
