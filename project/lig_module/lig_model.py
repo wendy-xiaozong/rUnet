@@ -77,7 +77,6 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
-        # targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         if batch_idx == self.train_log_step:
             log_all_info(
@@ -104,6 +103,10 @@ class LitModel(pl.LightningModule):
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
+        brain_mask = inputs == inputs[0][0][0]
+        predicts = predicts[brain_mask]
+        targets = targets[brain_mask]
+
         print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
         print(
             f"max: {np.max(targets)}, min: {np.min(targets)}, 1%: {np.percentile(targets, q=1)}, 5%: {np.percentile(targets, q=5)}"
@@ -122,16 +125,7 @@ class LitModel(pl.LightningModule):
         print(
             f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
         )
-        print(f"targets: {targets}")
 
-        predicts -= predicts[0][0][0]
-        brain_mask = inputs == inputs[0][0][0]
-        predicts[brain_mask] = 0
-        targets[brain_mask] = 0
-        # if batch_idx == 1:
-        #     log_all_info(
-        #         module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
-        #     )
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
         return {"diff_average": diff_average}
