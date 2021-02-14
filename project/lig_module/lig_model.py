@@ -40,7 +40,7 @@ class LitModel(pl.LightningModule):
             normalization="Batch",
             downsampling_type="max",
             use_sigmoid=False,
-            use_bias=False,
+            use_bias=True,
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
@@ -122,10 +122,9 @@ class LitModel(pl.LightningModule):
     def test_epoch_end(self, test_step_outputs):
         average = np.mean(test_step_outputs[0]["diff_average"])
         print(f"average absolute error: {average}")
-        return average
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate, weight_decay=5e-4)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
         # scheduler = ReduceLROnPlateau(optimizer, threshold=1e-10)
         lr_dict = {
             "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),

@@ -89,7 +89,7 @@ class LitModel_Diffusion(pl.LightningModule):
         inputs = inputs.cpu().detach().numpy().squeeze()
         num_non_zero = np.count_nonzero(inputs)
         targets = targets.cpu().detach().numpy().squeeze()
-        predicts = scale_img_to_0_255(logits.cpu().detach().numpy().squeeze())
+        predicts = logits.cpu().detach().numpy().squeeze()
         predicts -= predicts[0][0][0]
         brain_mask = inputs == inputs[0][0][0]
         predicts[brain_mask] = 0
@@ -104,7 +104,6 @@ class LitModel_Diffusion(pl.LightningModule):
     def test_epoch_end(self, test_step_outputs):
         average = np.mean(test_step_outputs[0]["diff_average"])
         print(f"average absolute error: {average}")
-        return average
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)

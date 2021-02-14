@@ -35,11 +35,11 @@ tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C wor
 cd work
 
 GPUS=4
-BATCH_SIZE=1
+BATCH_SIZE=3
 TASK=t1t2   #  diffusion
 X_image=t2.nii.gz
 y_image=t1.nii.gz
-LEARNING_RATE=1e-2
+LEARNING_RATE=1e-3
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
