@@ -99,13 +99,13 @@ class LitModel(pl.LightningModule):
         logits = self(inputs)
 
         inputs = inputs.cpu().detach().numpy().squeeze()
-        num_non_zero = np.count_nonzero(inputs)
+        # num_non_zero = np.count_nonzero(inputs)
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
         brain_mask = inputs == inputs[0][0][0]
-        predicts = predicts[brain_mask]
-        targets = targets[brain_mask]
+        predicts = predicts[~brain_mask]
+        targets = targets[~brain_mask]
 
         print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
         print(
