@@ -64,8 +64,8 @@ class LitModel(pl.LightningModule):
             log_all_info(
                 module=self,
                 img=inputs[0],
-                target=self.logit(targets[0]),
-                preb=self.logit(logits[0]),
+                target=targets[0],
+                preb=logits[0],
                 loss=loss,
                 batch_idx=batch_idx,
                 state="train",
@@ -82,8 +82,8 @@ class LitModel(pl.LightningModule):
             log_all_info(
                 module=self,
                 img=inputs[0],
-                target=self.logit(targets[0]),
-                preb=self.logit(logits[0]),
+                target=targets[0],
+                preb=logits[0],
                 loss=loss,
                 batch_idx=batch_idx,
                 state="val",
@@ -97,6 +97,17 @@ class LitModel(pl.LightningModule):
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
         logits = self(inputs)
+
+        if batch_idx == 1:
+            log_all_info(
+                module=self,
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
+                loss=0.0,
+                batch_idx=batch_idx,
+                state="test",
+            )
 
         inputs = inputs.cpu().detach().numpy().squeeze()
         # num_non_zero = np.count_nonzero(inputs)
@@ -125,7 +136,7 @@ class LitModel(pl.LightningModule):
         print(
             f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
         )
-        percents = [0.1, 0.2, 0.3, 0.5, 0.7, 1, 2, 3, 4, 5]
+        percents = [0.001, 0.005, 0.008, 0.01, 0.02, 0.03, 0.05, 0.07, 0.08, 0.1]
         MAEs = []
         for percent_1 in percents:
             for percent_2 in percents:
