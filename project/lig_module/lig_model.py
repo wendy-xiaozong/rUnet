@@ -125,37 +125,28 @@ class LitModel(pl.LightningModule):
         print(
             f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
         )
-        percents = [1, 2, 3, 4, 5]
+        percents = [0.1, 0.2, 0.3, 0.5, 0.7, 1, 2, 3, 4, 5]
         MAEs = []
-        for percent in percents:
-            predicts = scale_img_to_0_255(
-                predicts, imin=np.percentile(predicts, q=percent), imax=np.percentile(predicts, q=100 - percent)
-            )
-            targets = scale_img_to_0_255(
-                targets, imin=np.percentile(targets, q=percent), imax=np.percentile(targets, q=100 - percent)
-            )
-            diff_tensor = np.absolute(predicts - targets)
-            diff_average = np.mean(diff_tensor)
-            MAEs.append(diff_average)
-        return {
-            "diff_average_1": MAEs[0],
-            "diff_average_2": MAEs[1],
-            "diff_average_3": MAEs[2],
-            "diff_average_4": MAEs[3],
-            "diff_average_5": MAEs[4],
-        }
+        for percent_1 in percents:
+            for percent_2 in percents:
+                predicts = scale_img_to_0_255(
+                    predicts, imin=np.percentile(predicts, q=percent_1), imax=np.percentile(predicts, q=100 - percent_1)
+                )
+                targets = scale_img_to_0_255(
+                    targets, imin=np.percentile(targets, q=percent_2), imax=np.percentile(targets, q=100 - percent_2)
+                )
+                diff_tensor = np.absolute(predicts - targets)
+                diff_average = np.mean(diff_tensor)
+                MAEs.append(diff_average)
+        return_dict = {}
+        for id, MAE in enumerate(MAEs):
+            return_dict[f"diff_average_{id}"] = MAE
+        return return_dict
 
     def test_epoch_end(self, test_step_outputs):
-        average = np.mean(test_step_outputs[0]["diff_average_1"])
-        print(f"average absolute error for 1%: {average}")
-        average = np.mean(test_step_outputs[0]["diff_average_2"])
-        print(f"average absolute error for 2%: {average}")
-        average = np.mean(test_step_outputs[0]["diff_average_3"])
-        print(f"average absolute error for 3%: {average}")
-        average = np.mean(test_step_outputs[0]["diff_average_4"])
-        print(f"average absolute error for 4%: {average}")
-        average = np.mean(test_step_outputs[0]["diff_average_5"])
-        print(f"average absolute error for 5%: {average}")
+        for i in range(100):
+            average = np.mean(test_step_outputs[0][f"diff_average_{i}"])
+            print(f"average absolute error for No. {i}: {average}")
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
