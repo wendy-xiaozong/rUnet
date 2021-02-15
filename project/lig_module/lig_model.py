@@ -89,10 +89,10 @@ class LitModel(pl.LightningModule):
 
         if batch_idx in [2, 10, 11, 21, 34]:
             fig, ax = plt.subplots(3, 1, figsize=(6, 25))
-            sns.distplot(data=targets, kde=True, ax=ax[0])
-            sns.distplot(data=predicts, kde=True, ax=ax[1])
+            sns.distplot(targets, kde=True, ax=ax[0])
+            sns.distplot(predicts, kde=True, ax=ax[1])
             diff = predicts - targets
-            sns.histplot(data=diff, kde=True, ax=ax[2])
+            sns.histplot(diff, kde=True, ax=ax[2])
             ax[0].set_title("targets")
             ax[1].set_title("predicts")
             ax[2].set_title("difference")
