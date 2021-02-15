@@ -103,23 +103,25 @@ class LitModel(pl.LightningModule):
         print(
             f"max: {np.max(targets)}, min: {np.min(targets)}, 1%: {np.percentile(targets, q=1)}, 5%: {np.percentile(targets, q=5)}"
         )
+        # print(
+        #     f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
+        # )
         print(
-            f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
-        )
-        print(
-            f"90%: {np.percentile(targets, q=90)}, 95%: {np.percentile(targets, q=95)}, 99%: {np.percentile(targets, q=99)}"
+            f"99%: {np.percentile(targets, q=99)}, 99.5%: {np.percentile(targets, q=99.5)}, 99.8%: {np.percentile(targets, q=99.8)}"
         )
 
         print(f"logits median: {np.median(predicts)}, mean: {np.mean(predicts)}, std: {np.std(predicts)}")
-        print(f"max: {np.max(predicts)}, min: {np.min(predicts)}, 1%: {np.percentile(predicts, q=1)}")
         print(
-            f"10%: {np.percentile(predicts, q=10)}, 20%: {np.percentile(predicts, q=20)}, 30%: {np.percentile(predicts, q=30)}"
+            f"max: {np.max(predicts)}, min: {np.min(predicts)}, 1%: {np.percentile(predicts, q=1)}, 5%: {np.percentile(predicts, q=5)}"
         )
+        # print(
+        #     f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
+        # )
         print(
-            f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
+            f"99%: {np.percentile(predicts, q=99)}, 99.5%: {np.percentile(predicts, q=99.5)}, 99.8%: {np.percentile(predicts, q=99.8)}"
         )
 
-        percents = [10, 15, 16, 17, 20, 25, 30, 35, 40]
+        percents = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.7, 1, 2, 5]
         MAEs = []
         for percent_1 in percents:
             for percent_2 in percents:
