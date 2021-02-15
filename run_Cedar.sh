@@ -4,7 +4,7 @@
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
 #SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
-#SBATCH --time=00-00:20      # time (DD-HH:MM)
+#SBATCH --time=00-01:00      # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
 
@@ -57,3 +57,5 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
 
 #       --fast_dev_run
 #       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
+
+zip /home/jueqi/projects/def-jlevman/jueqi/Data/t1t2pred.zip 2.npz 10.npz 11.npz 21.npz 34.npz

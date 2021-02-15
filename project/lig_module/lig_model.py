@@ -7,6 +7,7 @@ import pytorch_lightning as pl
 import random
 import torch
 import seaborn as sns
+import matplotlib.pyplot as plt
 import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import Sigmoid, MSELoss, Softmax
@@ -78,16 +79,6 @@ class LitModel(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        # log_all_info(
-        #     module=self,
-        #     img=inputs[0],
-        #     target=targets[0],
-        #     preb=logits[0],
-        #     loss=loss,
-        #     batch_idx=batch_idx,
-        #     state="val",
-        # )
-
         inputs = inputs.cpu().detach().numpy().squeeze()
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
@@ -96,16 +87,22 @@ class LitModel(pl.LightningModule):
         predicts = predicts[~brain_mask]
         targets = targets[~brain_mask]
 
-        if batch_idx == [2, 10, 24, 55, 60]:
-            sns.histplot(data=predicts, x="target", kde=True)
+        if batch_idx == [2, 10, 11, 21, 34]:
+            fig, ax = plt.subplots(3, 1, figsize=(6, 25))
+            sns.distplot(data=targets, kde=True, ax=ax[0])
+            sns.distplot(data=predicts, kde=True, ax=ax[1])
+            diff = predicts - targets
+            sns.histplot(data=diff, kde=True, ax=ax[2])
+            ax[0].set_title("targets")
+            ax[1].set_title("predicts")
+            ax[2].set_title("difference")
+            fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
+            np.savez(f"{batch_idx}.npz")
 
         print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
         print(
             f"max: {np.max(targets)}, min: {np.min(targets)}, 1%: {np.percentile(targets, q=1)}, 5%: {np.percentile(targets, q=5)}"
         )
-        # print(
-        #     f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
-        # )
         print(
             f"99%: {np.percentile(targets, q=99)}, 99.5%: {np.percentile(targets, q=99.5)}, 99.8%: {np.percentile(targets, q=99.8)}"
         )
@@ -114,9 +111,6 @@ class LitModel(pl.LightningModule):
         print(
             f"max: {np.max(predicts)}, min: {np.min(predicts)}, 1%: {np.percentile(predicts, q=1)}, 5%: {np.percentile(predicts, q=5)}"
         )
-        # print(
-        #     f"10%: {np.percentile(targets, q=10)}, 20%: {np.percentile(targets, q=20)}, 30%: {np.percentile(targets, q=30)}"
-        # )
         print(
             f"99%: {np.percentile(predicts, q=99)}, 99.5%: {np.percentile(predicts, q=99.5)}, 99.8%: {np.percentile(predicts, q=99.8)}"
         )

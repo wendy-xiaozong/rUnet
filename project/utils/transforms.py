@@ -1,6 +1,7 @@
 from typing import List
 from monai.transforms import NormalizeIntensity, Compose, ToTensor, Resize, SpatialPad
 from monai.transforms.compose import Transform
+from monai.transforms.intensity.array import ScaleIntensity
 from utils.cropping import crop_to_nonzero
 from utils.const import IMAGESIZE
 
