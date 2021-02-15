@@ -6,6 +6,7 @@ import pandas as pd
 import pytorch_lightning as pl
 import random
 import torch
+import seaborn as sns
 import torch.nn.functional as F
 from torch import Tensor
 from torch.nn import Sigmoid, MSELoss, Softmax
@@ -77,27 +78,15 @@ class LitModel(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        # if batch_idx == self.train_log_step:
-        #     log_all_info(
-        #         module=self,
-        #         img=inputs[0],
-        #         target=targets[0],
-        #         preb=logits[0],
-        #         loss=loss,
-        #         batch_idx=batch_idx,
-        #         state="val",
-        #     )
-
-        if batch_idx == 2:
-            log_all_info(
-                module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
-                loss=loss,
-                batch_idx=batch_idx,
-                state="test",
-            )
+        # log_all_info(
+        #     module=self,
+        #     img=inputs[0],
+        #     target=targets[0],
+        #     preb=logits[0],
+        #     loss=loss,
+        #     batch_idx=batch_idx,
+        #     state="val",
+        # )
 
         inputs = inputs.cpu().detach().numpy().squeeze()
         targets = targets.cpu().detach().numpy().squeeze()
@@ -106,6 +95,9 @@ class LitModel(pl.LightningModule):
         brain_mask = inputs == inputs[0][0][0]
         predicts = predicts[~brain_mask]
         targets = targets[~brain_mask]
+
+        if batch_idx == [2, 10, 24, 55, 60]:
+            sns.histplot(data=predicts, x="target", kde=True)
 
         print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
         print(
