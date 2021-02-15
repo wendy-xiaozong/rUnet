@@ -88,7 +88,7 @@ class LitModel(pl.LightningModule):
         targets = targets[~brain_mask]
 
         if batch_idx in [2, 10, 11, 21, 34]:
-            fig, ax = plt.subplots(3, 1, figsize=(6, 25))
+            fig, ax = plt.subplots(3, 1, figsize=(15, 25))
             sns.distplot(targets, kde=True, ax=ax[0])
             sns.distplot(predicts, kde=True, ax=ax[1])
             diff = predicts - targets
@@ -97,7 +97,7 @@ class LitModel(pl.LightningModule):
             ax[1].set_title("predicts")
             ax[2].set_title("difference")
             fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
-            np.savez(f"{batch_idx}.npz")
+            np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
 
         print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
         print(
