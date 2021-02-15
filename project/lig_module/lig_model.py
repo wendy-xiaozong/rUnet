@@ -87,7 +87,7 @@ class LitModel(pl.LightningModule):
         predicts = predicts[~brain_mask]
         targets = targets[~brain_mask]
 
-        if batch_idx == [2, 10, 11, 21, 34]:
+        if batch_idx in [2, 10, 11, 21, 34]:
             fig, ax = plt.subplots(3, 1, figsize=(6, 25))
             sns.distplot(data=targets, kde=True, ax=ax[0])
             sns.distplot(data=predicts, kde=True, ax=ax[1])
