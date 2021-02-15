@@ -20,6 +20,8 @@ def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> n
     imin = img.min() if imin is None else imin
     imax = img.max() if imax is None else imax
     scaled = np.array(((img - imin) * (1 / (imax - imin))) * 255, dtype="uint8")
+    scaled[scaled < 0] = 0
+    scaled[scaled >= 255] = 255
     return scaled
 
 
@@ -125,7 +127,7 @@ class LitModel(pl.LightningModule):
             f"90%: {np.percentile(predicts, q=90)}, 95%: {np.percentile(predicts, q=95)}, 99%: {np.percentile(predicts, q=99)}"
         )
 
-        percents = [0.1, 0.5, 1, 2, 4, 5, 8, 10, 12, 15]
+        percents = [10, 15, 16, 17, 20, 25, 30, 35, 40]
         MAEs = []
         for percent_1 in percents:
             for percent_2 in percents:
@@ -138,7 +140,7 @@ class LitModel(pl.LightningModule):
                 diff_tensor = np.absolute(predicts - targets)
                 diff_average = np.mean(diff_tensor)
                 MAEs.append(diff_average)
-        
+
         return_dict = {}
         for id, MAE in enumerate(MAEs):
             return_dict[f"diff_average_{id}"] = MAE
