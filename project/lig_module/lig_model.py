@@ -89,15 +89,15 @@ class LitModel(pl.LightningModule):
         # targets = targets[~brain_mask]
 
         if batch_idx in [4, 6, 10, 12, 13]:
-            fig, ax = plt.subplots(3, 1, figsize=(15, 25))
-            sns.distplot(targets, kde=True, ax=ax[0])
-            sns.distplot(predicts, kde=True, ax=ax[1])
-            diff = predicts - targets
-            sns.histplot(diff, kde=True, ax=ax[2])
-            ax[0].set_title("targets")
-            ax[1].set_title("predicts")
-            ax[2].set_title("difference")
-            fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
+            # fig, ax = plt.subplots(3, 1, figsize=(15, 25))
+            # sns.distplot(targets, kde=True, ax=ax[0])
+            # sns.distplot(predicts, kde=True, ax=ax[1])
+            # diff = predicts - targets
+            # sns.histplot(diff, kde=True, ax=ax[2])
+            # ax[0].set_title("targets")
+            # ax[1].set_title("predicts")
+            # ax[2].set_title("difference")
+            # fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
             np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
 
         # percents = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.7, 1, 2, 5]
@@ -188,7 +188,7 @@ class LitModel(pl.LightningModule):
     @staticmethod
     def add_model_specific_args(parent_parser: ArgumentParser) -> ArgumentParser:
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
-        parser.add_argument("--learning_rate", type=float, default=1e-10)
+        parser.add_argument("--learning_rate", type=float, default=1e-15)
         # parser.add_argument("--loss", type=str, default="BCEWL", help="Loss Function")
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
