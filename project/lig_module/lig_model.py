@@ -71,7 +71,7 @@ class LitModel(pl.LightningModule):
         #     )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         # return {"loss": loss}
-        return {}
+        return {"loss": 0.0}
 
     def validation_step(self, batch, batch_idx: int):
         inputs, targets = batch
