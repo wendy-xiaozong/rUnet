@@ -59,18 +59,19 @@ class LitModel(pl.LightningModule):
 
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        if batch_idx == self.train_log_step:
-            log_all_info(
-                module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
-                loss=loss,
-                batch_idx=batch_idx,
-                state="train",
-            )
+        # if batch_idx == self.train_log_step:
+        #     log_all_info(
+        #         module=self,
+        #         img=inputs[0],
+        #         target=targets[0],
+        #         preb=logits[0],
+        #         loss=loss,
+        #         batch_idx=batch_idx,
+        #         state="train",
+        #     )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
-        return {"loss": loss}
+        # return {"loss": loss}
+        return {}
 
     def validation_step(self, batch, batch_idx: int):
         inputs, targets = batch
@@ -99,35 +100,19 @@ class LitModel(pl.LightningModule):
             fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
             np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
 
-        print(f"targets median: {np.median(targets)}, mean: {np.mean(targets)}, std: {np.std(targets)}")
-        print(
-            f"max: {np.max(targets)}, min: {np.min(targets)}, 1%: {np.percentile(targets, q=1)}, 5%: {np.percentile(targets, q=5)}"
-        )
-        print(
-            f"99%: {np.percentile(targets, q=99)}, 99.5%: {np.percentile(targets, q=99.5)}, 99.8%: {np.percentile(targets, q=99.8)}"
-        )
-
-        print(f"logits median: {np.median(predicts)}, mean: {np.mean(predicts)}, std: {np.std(predicts)}")
-        print(
-            f"max: {np.max(predicts)}, min: {np.min(predicts)}, 1%: {np.percentile(predicts, q=1)}, 5%: {np.percentile(predicts, q=5)}"
-        )
-        print(
-            f"99%: {np.percentile(predicts, q=99)}, 99.5%: {np.percentile(predicts, q=99.5)}, 99.8%: {np.percentile(predicts, q=99.8)}"
-        )
-
-        percents = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.7, 1, 2, 5]
-        MAEs = []
-        for percent_1 in percents:
-            for percent_2 in percents:
-                predicts = scale_img_to_0_255(
-                    predicts, imin=np.percentile(predicts, q=percent_1), imax=np.percentile(predicts, q=100 - percent_1)
-                )
-                targets = scale_img_to_0_255(
-                    targets, imin=np.percentile(targets, q=percent_2), imax=np.percentile(targets, q=100 - percent_2)
-                )
-                diff_tensor = np.absolute(predicts - targets)
-                diff_average = np.mean(diff_tensor)
-                MAEs.append(diff_average)
+        # percents = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.7, 1, 2, 5]
+        # MAEs = []
+        # for percent_1 in percents:
+        #     for percent_2 in percents:
+        #         predicts = scale_img_to_0_255(
+        #             predicts, imin=np.percentile(predicts, q=percent_1), imax=np.percentile(predicts, q=100 - percent_1)
+        #         )
+        #         targets = scale_img_to_0_255(
+        #             targets, imin=np.percentile(targets, q=percent_2), imax=np.percentile(targets, q=100 - percent_2)
+        #         )
+        #         diff_tensor = np.absolute(predicts - targets)
+        #         diff_average = np.mean(diff_tensor)
+        #         MAEs.append(diff_average)
 
         return_dict = {}
         for id, MAE in enumerate(MAEs):
