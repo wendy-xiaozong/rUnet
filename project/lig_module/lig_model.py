@@ -114,18 +114,18 @@ class LitModel(pl.LightningModule):
         #         diff_average = np.mean(diff_tensor)
         #         MAEs.append(diff_average)
 
-        return_dict = {}
-        for id, MAE in enumerate(MAEs):
-            return_dict[f"diff_average_{id}"] = MAE
-        return return_dict
+        # return_dict = {}
+        # for id, MAE in enumerate(MAEs):
+        #     return_dict[f"diff_average_{id}"] = MAE
+        return {}
 
     def validation_epoch_end(self, validation_step_outputs):
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
 
-        for i in range(100):
-            average = np.mean(validation_step_outputs[0][f"diff_average_{i}"])
-            print(f"average absolute error for No. {i}: {average}")
+        # for i in range(100):
+        #     average = np.mean(validation_step_outputs[0][f"diff_average_{i}"])
+        #     print(f"average absolute error for No. {i}: {average}")
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch
