@@ -71,7 +71,7 @@ class LitModel(pl.LightningModule):
         #     )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         # return {"loss": loss}
-        return {"loss": 0.0}
+        return {"loss": loss}
 
     def validation_step(self, batch, batch_idx: int):
         inputs, targets = batch
@@ -188,7 +188,7 @@ class LitModel(pl.LightningModule):
     @staticmethod
     def add_model_specific_args(parent_parser: ArgumentParser) -> ArgumentParser:
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
-        parser.add_argument("--learning_rate", type=float, default=1e-2)
+        parser.add_argument("--learning_rate", type=float, default=1e-10)
         # parser.add_argument("--loss", type=str, default="BCEWL", help="Loss Function")
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
