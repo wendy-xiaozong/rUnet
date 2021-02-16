@@ -61,8 +61,6 @@ def get_preprocess(is_label: bool) -> List:
     if not is_label:
         return [
             Crop(),
-            # Use this instead of ScaleIntensity because of nnUnet.
-            # But I don't think this should make a lot difference
             NormalizeIntensity(nonzero=True),
             # I really donno why I need to the unsqueeze things
             # maybe the way I use the data augmentation is the standard way(?)

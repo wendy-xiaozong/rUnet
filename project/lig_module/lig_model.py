@@ -83,11 +83,11 @@ class LitModel(pl.LightningModule):
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
-        brain_mask = inputs == inputs[0][0][0]
-        predicts = predicts[~brain_mask]
-        targets = targets[~brain_mask]
+        # brain_mask = inputs == inputs[0][0][0]
+        # predicts = predicts[~brain_mask]
+        # targets = targets[~brain_mask]
 
-        if batch_idx in [2, 10, 11, 21, 34]:
+        if batch_idx in [4, 6, 10, 12, 13]:
             fig, ax = plt.subplots(3, 1, figsize=(15, 25))
             sns.distplot(targets, kde=True, ax=ax[0])
             sns.distplot(predicts, kde=True, ax=ax[1])
