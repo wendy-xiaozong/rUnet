@@ -10,6 +10,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 from torch import Tensor
+from tempfile import TemporaryFile
 from torch.nn import Sigmoid, MSELoss, Softmax
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
@@ -98,7 +99,7 @@ class LitModel(pl.LightningModule):
             # ax[1].set_title("predicts")
             # ax[2].set_title("difference")
             # fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
-            np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
+            np.save(f"{batch_idx}.npy", target=targets, predict=predicts)
 
         # percents = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.7, 1, 2, 5]
         # MAEs = []
