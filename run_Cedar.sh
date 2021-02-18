@@ -58,4 +58,4 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
 #       --fast_dev_run
 #       --checkpoint_file="epoch=285-val_loss=5.07025e-09.ckpt" \
 
-zip /home/jueqi/projects/def-jlevman/jueqi/Data/t1t2pred.zip 4.npz 6.npz 10.npz 12.npz 13.npz
+# zip /home/jueqi/projects/def-jlevman/jueqi/Data/t1t2pred.zip 4.npz 6.npz 10.npz 12.npz 13.npz
