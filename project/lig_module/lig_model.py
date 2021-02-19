@@ -117,47 +117,44 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
         logits = self(inputs)
 
-        if batch_idx == 1:
-            log_all_info(
-                module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
-                loss=0.0,
-                batch_idx=batch_idx,
-                state="test",
-            )
+        # if batch_idx == 1:
+        #     log_all_info(
+        #         module=self,
+        #         img=inputs[0],
+        #         target=targets[0],
+        #         preb=logits[0],
+        #         loss=0.0,
+        #         batch_idx=batch_idx,
+        #         state="test",
+        #     )
 
         inputs = inputs.cpu().detach().numpy().squeeze()
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
         brain_mask = inputs == inputs[0][0][0]
-        predicts = predicts[~brain_mask]
-        targets = targets[~brain_mask]
 
-        percents = [0.001, 0.005, 0.008, 0.01, 0.02, 0.03, 0.05, 0.07, 0.08, 0.1]
-        MAEs = []
-        for percent_1 in percents:
-            for percent_2 in percents:
-                predicts = scale_img_to_0_255(
-                    predicts, imin=np.percentile(predicts, q=percent_1), imax=np.percentile(predicts, q=100 - percent_1)
-                )
-                targets = scale_img_to_0_255(
-                    targets, imin=np.percentile(targets, q=percent_2), imax=np.percentile(targets, q=100 - percent_2)
-                )
-                diff_tensor = np.absolute(predicts - targets)
-                diff_average = np.mean(diff_tensor)
-                MAEs.append(diff_average)
-        return_dict = {}
-        for id, MAE in enumerate(MAEs):
-            return_dict[f"diff_average_{id}"] = MAE
-        return return_dict
+        pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
+        targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
+        pred_255 = np.floor(256 * (pred_clip / (self.clip_min + self.clip_max)))
+        targ_255 = np.floor(256 * (targ_clip / (self.clip_min + self.clip_max)))
+        pred_255[brain_mask] = 0
+        targ_255[brain_mask] = 0
+
+        diff_255 = np.absolute(pred_255.ravel() - targ_255.ravel())
+        mae = np.mean(diff_255)
+
+        diff_255_mask = np.absolute(pred_255[~brain_mask].ravel() - targ_255[~brain_mask].ravel())
+        mae_mask = np.mean(diff_255_mask)
+
+        return {"MAE": mae, "MAE_mask": mae_mask}
 
     def test_epoch_end(self, test_step_outputs):
-        for i in range(100):
-            average = np.mean(test_step_outputs[0][f"diff_average_{i}"])
-            print(f"average absolute error for No. {i}: {average}")
+        average = np.mean(test_step_outputs[0]["MAE"])
+        print(f"average absolute error on whole image: {average}")
+
+        average = np.mean(test_step_outputs[0]["MAE_mask"])
+        print(f"average absolute error on mask: {average}")
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)

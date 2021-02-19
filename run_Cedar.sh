@@ -4,7 +4,7 @@
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
 #SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
-#SBATCH --time=00-00:30      # time (DD-HH:MM)
+#SBATCH --time=00-00:40      # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
 
