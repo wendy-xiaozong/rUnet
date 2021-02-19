@@ -19,10 +19,12 @@ def plot_slices(
     min_value = 255
     for i, (pred, targ) in enumerate(zip(processed_preds, processed_targets)):
         mask = targ == 0
-        pred_255 = np.clip(pred, -clip_min, clip_max) - min(-clip_min, np.min(pred))
-        targ_255 = np.clip(targ, -clip_min, clip_max) - min(-clip_min, np.min(targ))
-        pred_255 = np.floor(255 * (pred_255 / (clip_max + clip_min)))
-        targ_255 = np.floor(255 * (targ_255 / (clip_max + clip_min)))
+        pred_255 = np.clip(pred, -clip_min, clip_max)
+        targ_255 = np.clip(targ, -clip_min, clip_max)
+        min_pred = min(-clip_min, np.min(pred))
+        min_targ = min(-clip_min, np.min(targ))
+        pred_255 = np.floor(255 * ((pred_255 - min_pred) / (clip_max - min_pred)))
+        targ_255 = np.floor(255 * ((targ_255 - min_targ) / (clip_max - min_targ)))
         max_value = max(max(max_value, np.max(pred_255)), np.max(targ_255))
         min_value = min(min(min_value, np.min(pred_255)), np.min(targ_255))
 
@@ -89,3 +91,6 @@ if __name__ == "__main__":
             mae_dict[f"clip_min:{clip_min}, clip_max:{clip_max}"] = mae
 
     print(mae_dict)
+
+    for key, value in mae_dict.items():
+        print(f"{key}: {value}")

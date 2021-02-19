@@ -51,7 +51,7 @@ class LitModel(pl.LightningModule):
         self.criterion = MSELoss()
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
-        self.clip_min = 5
+        self.clip_min = 2
         self.clip_max = 5
 
     def forward(self, x: Any) -> Any:
@@ -87,17 +87,6 @@ class LitModel(pl.LightningModule):
         predicts = logits.cpu().detach().numpy().squeeze()
 
         brain_mask = inputs == inputs[0][0][0]
-
-        # if batch_idx in choose_list:
-        #     fig, ax = plt.subplots(3, 1, figsize=(15, 25))
-        #     sns.distplot(targets_mask, kde=True, ax=ax[0])
-        #     sns.distplot(predicts_mask, kde=True, ax=ax[1])
-        #     sns.distplot(inputs_mask, kde=True, ax=ax[2])
-        #     ax[0].set_title("targets")
-        #     ax[1].set_title("predicts")
-        #     ax[2].set_title("inputs")
-        #     fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
-        # np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
 
         pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
         targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
