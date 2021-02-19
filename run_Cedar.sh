@@ -39,7 +39,7 @@ BATCH_SIZE=3
 TASK=t1t2   #  diffusion
 X_image=t1.nii.gz
 y_image=t2.nii.gz
-LEARNING_RATE=1e-15
+LEARNING_RATE=1e-20
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script

@@ -51,7 +51,8 @@ class LitModel(pl.LightningModule):
         self.criterion = MSELoss()
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
-        self.CLIP = [6, 5.5, 5, 4.5, 4, 3.7, 3.5, 3, 2.5, 2]
+        self.clip_min = 5
+        self.clip_max = 5
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -86,59 +87,42 @@ class LitModel(pl.LightningModule):
         predicts = logits.cpu().detach().numpy().squeeze()
 
         brain_mask = inputs == inputs[0][0][0]
-        predicts_mask = predicts[~brain_mask]
-        targets_mask = targets[~brain_mask]
-        inputs_mask = targets[~brain_mask]
-        choose_list = [8, 10, 15, 16, 17]
 
-        if batch_idx in choose_list:
-            fig, ax = plt.subplots(3, 1, figsize=(15, 25))
-            sns.distplot(targets_mask, kde=True, ax=ax[0])
-            sns.distplot(predicts_mask, kde=True, ax=ax[1])
-            sns.histplot(inputs_mask, kde=True, ax=ax[2])
-            ax[0].set_title("targets")
-            ax[1].set_title("predicts")
-            ax[2].set_title("inputs")
-            fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
-            # np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
+        # if batch_idx in choose_list:
+        #     fig, ax = plt.subplots(3, 1, figsize=(15, 25))
+        #     sns.distplot(targets_mask, kde=True, ax=ax[0])
+        #     sns.distplot(predicts_mask, kde=True, ax=ax[1])
+        #     sns.distplot(inputs_mask, kde=True, ax=ax[2])
+        #     ax[0].set_title("targets")
+        #     ax[1].set_title("predicts")
+        #     ax[2].set_title("inputs")
+        #     fig.savefig(f"/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/predicts_and_targets_{batch_idx}.png")
+        # np.savez(f"{batch_idx}.npz", target=targets, predict=predicts)
 
-        MAEs = []
-        MAEs_mask = []
-        for clip_min in self.CLIP:
-            for clip_max in self.CLIP:
-                pred_clip = np.clip(predicts, -clip_min, clip_max) + clip_min
-                targ_clip = np.clip(targets, -clip_min, clip_max) + clip_min
-                pred_255 = np.floor(256 * (pred_clip / (clip_min + clip_max)))
-                targ_255 = np.floor(256 * (targ_clip / (clip_min + clip_max)))
-                pred_255[brain_mask] = 0
-                targ_255[brain_mask] = 0
+        pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
+        targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
+        pred_255 = np.floor(256 * (pred_clip / (self.clip_min + self.clip_max)))
+        targ_255 = np.floor(256 * (targ_clip / (self.clip_min + self.clip_max)))
+        pred_255[brain_mask] = 0
+        targ_255[brain_mask] = 0
 
-                diff_255 = np.absolute(pred_255.ravel() - targ_255.ravel())
-                diff_average = np.mean(diff_255)
-                MAEs.append(diff_average)
+        diff_255 = np.absolute(pred_255.ravel() - targ_255.ravel())
+        mae = np.mean(diff_255)
 
-                diff_255_mask = np.absolute(pred_255[~brain_mask].ravel() - targ_255[~brain_mask].ravel())
-                diff_average_mask = np.mean(diff_255_mask)
-                MAEs_mask.append(diff_average_mask)
+        diff_255_mask = np.absolute(pred_255[~brain_mask].ravel() - targ_255[~brain_mask].ravel())
+        mae_mask = np.mean(diff_255_mask)
 
-        return_dict = {}
-        for id, MAE in enumerate(MAEs):
-            return_dict[f"diff_average_{id}"] = MAE
-        for id, MAE in enumerate(MAEs_mask):
-            return_dict[f"diff_average_mask_{id}"] = MAE
-        return return_dict
+        return {"MAE": mae, "MAE_mask": mae_mask}
 
     def validation_epoch_end(self, validation_step_outputs):
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
 
-        for i in range(100):
-            average = np.mean(validation_step_outputs[0][f"diff_average_{i}"])
-            print(f"average absolute error for No. {i}: {average}")
+        average = np.mean(validation_step_outputs[0]["MAE"])
+        print(f"average absolute error on whole image: {average}")
 
-        for i in range(100):
-            average = np.mean(validation_step_outputs[0][f"diff_average_mask_{i}"])
-            print(f"average absolute error on mask for No. {i}: {average}")
+        average = np.mean(validation_step_outputs[0]["MAE_mask"])
+        print(f"average absolute error on mask: {average}")
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch

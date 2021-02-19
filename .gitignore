@@ -46,6 +46,7 @@ processed/
 raw/
 checkpoint/
 log/
+plot/
 temp_model.ckpt
 lr_find_temp.ckpt
 pt/
