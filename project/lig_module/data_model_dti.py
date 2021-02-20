@@ -12,17 +12,18 @@ import pandas as pd
 import pytorch_lightning as pl
 from utils.const import DIFFUSION_INPUT, DIFFUSION_LABEL
 from monai.transforms import Compose
-from utils.transforms import get_diffusion_preprocess
+from utils.transforms import get_diffusion_preprocess, get_diffusion_label_preprocess
 from sklearn.model_selection import train_test_split
 from monai.transforms import LoadNifti, apply_transform
 from torch.utils.data import DataLoader, Dataset
 
 
 class DiffusionDataset(Dataset):
-    def __init__(self, X_path: List[str], y_path: List[str], transform: Compose):
+    def __init__(self, X_path: List[str], y_path: List[str], X_transform: Compose):
         self.X_path = X_path
         self.y_path = y_path
-        self.transform = transform
+        self.X_transform = X_transform
+        self.y_transform = get_diffusion_label_preprocess()
 
     def __len__(self):
         return int(len(self.X_path))
@@ -33,8 +34,9 @@ class DiffusionDataset(Dataset):
         y_img, compatible_meta = loadnifti(self.y_path[i])
 
         print(f"X beginning shape: {X_img.shape}")
-        X_img = apply_transform(self.transform, X_img)
-        # y_img = apply_transform(self.transform, y_img)
+        print(f"y beginning shape: {y_img.shape}")
+        X_img = apply_transform(self.X_transform, X_img)
+        y_img = apply_transform(self.y_transform, y_img)
 
         return X_img, y_img
 

@@ -44,15 +44,21 @@ class Transpose(Transform):
         pass
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
-        return np.transpose(img, (3, 0, 1, 2))
+        img = np.transpose(img, (3, 0, 1, 2))
+        print(f"input shape after transpose")
+        return img
 
 
 def get_diffusion_preprocess() -> List:
-    return Compose([NormalizeIntensity(nonzero=True), Transpose(), Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE))])
+    return Compose(
+        [NormalizeIntensity(nonzero=True), Transpose(), Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)), ToTensor()]
+    )
 
 
 def get_diffusion_label_preprocess() -> List:
-    return Compose([NormalizeIntensity(nonzero=True), Unsqueeze(), Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE))])
+    return Compose(
+        [NormalizeIntensity(nonzero=True), Unsqueeze(), Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)), ToTensor()]
+    )
 
 
 def get_preprocess(is_label: bool) -> List:
