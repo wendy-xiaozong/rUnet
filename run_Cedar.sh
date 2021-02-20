@@ -37,8 +37,8 @@ cd work
 GPUS=4
 BATCH_SIZE=1
 TASK=t1t2   # diffusion
-X_image=t1.nii.gz
-y_image=t2.nii.gz
+X_image=t2.nii.gz
+y_image=t1.nii.gz
 LEARNING_RATE=1e-20
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
@@ -57,5 +57,4 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
 
 #       --fast_dev_run
 #
-
 # tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz
