@@ -32,8 +32,8 @@ class DiffusionDataset(Dataset):
         X_img, compatible_meta = loadnifti(self.X_path[i])
         y_img, compatible_meta = loadnifti(self.y_path[i])
 
+        print(f"X beginning shape: {X_img.shape}")
         X_img = apply_transform(self.transform, X_img)
-        print(f"X shape: {X_img.shape}")
         # y_img = apply_transform(self.transform, y_img)
 
         return X_img, y_img
@@ -53,7 +53,10 @@ class DataModule_Diffusion(pl.LightningDataModule):
         # val_transforms = get_val_img_transforms()
         preprocess = get_diffusion_preprocess()
 
-        self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
+        # self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
+        # self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
+
+        self.train_dataset = DiffusionDataset(X_path=X, y_path=y, transform=preprocess)
         self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
 
     def train_dataloader(self):

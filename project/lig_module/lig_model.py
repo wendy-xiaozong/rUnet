@@ -10,7 +10,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 from torch import Tensor
-from tempfile import TemporaryFile
 from torch.nn import Sigmoid, MSELoss, Softmax
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
