@@ -71,6 +71,8 @@ class LitModel(pl.LightningModule):
             loss=loss,
             batch_idx=batch_idx,
             state="train",
+            input_img_type=self.hparams.X_image,
+            target_img_type=self.hparams.y_image
         )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         return {"loss": loss}
@@ -91,6 +93,8 @@ class LitModel(pl.LightningModule):
             loss=loss,
             batch_idx=batch_idx,
             state="train",
+            input_img_type=self.hparams.X_image,
+            target_img_type=self.hparams.y_image
         )
 
         inputs = inputs.cpu().detach().numpy().squeeze()
