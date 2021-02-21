@@ -32,7 +32,7 @@ class LitModel(pl.LightningModule):
         super(LitModel, self).__init__()
         self.hparams = hparams
         self.model = UNet(
-            in_channels=1,
+            in_channels=hparams.in_channels,
             out_classes=1,
             dimensions=3,
             padding_mode="zeros",
@@ -61,16 +61,16 @@ class LitModel(pl.LightningModule):
 
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        # if batch_idx == self.train_log_step:
-        #     log_all_info(
-        #         module=self,
-        #         img=inputs[0],
-        #         target=targets[0],
-        #         preb=logits[0],
-        #         loss=loss,
-        #         batch_idx=batch_idx,
-        #         state="train",
-        #     )
+        if batch_idx == self.train_log_step:
+            log_all_info(
+                module=self,
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
+                loss=loss,
+                batch_idx=batch_idx,
+                state="train",
+            )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         return {"loss": loss}
 
@@ -80,6 +80,17 @@ class LitModel(pl.LightningModule):
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
+
+        if batch_idx == self.val_log_step:
+            log_all_info(
+                module=self,
+                img=inputs[0],
+                target=targets[0],
+                preb=logits[0],
+                loss=loss,
+                batch_idx=batch_idx,
+                state="train",
+            )
 
         inputs = inputs.cpu().detach().numpy().squeeze()
         targets = targets.cpu().detach().numpy().squeeze()
@@ -107,10 +118,10 @@ class LitModel(pl.LightningModule):
         self.val_log_step = random.randint(1, 100)
 
         average = np.mean(validation_step_outputs[0]["MAE"])
-        print(f"average absolute error on whole image: {average}")
+        self.log("val_MAE", average, sync_dist=True, on_step=False, on_epoch=True)
 
         average = np.mean(validation_step_outputs[0]["MAE_mask"])
-        print(f"average absolute error on mask: {average}")
+        self.log("val_MAE_mask", average, sync_dist=True, on_step=False, on_epoch=True)
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch

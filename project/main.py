@@ -63,7 +63,7 @@ def main(hparams: Namespace) -> None:
         # resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
-        # max_epochs=100000,
+        max_epochs=100000,
         # max_epochs=287,
         # max_epochs=1,
         # auto_scale_batch_size="binsearch", # for auto scaling of batch size
@@ -71,21 +71,21 @@ def main(hparams: Namespace) -> None:
 
     if hparams.task == "t1t2":
         model = LitModel(hparams)
-        data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image)
+        data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image, using_flair=True)
     elif hparams.task == "diffusion":
         model = LitModel_Diffusion(hparams)
         data_module = DataModule_Diffusion(hparams.batch_size)
 
-    # trainer.fit(model, data_module)
-    ckpt_path = Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file
+    trainer.fit(model, data_module)
+    # ckpt_path = Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file
     # print(f"ckpt path: {str(ckpt_path)}")
 
-    trainer = Trainer(gpus=hparams.gpus, distributed_backend="ddp")
-    trainer.test(
-        model=model,
-        ckpt_path=str(ckpt_path),
-        datamodule=data_module,
-    )
+    # trainer = Trainer(gpus=hparams.gpus, distributed_backend="ddp")
+    # trainer.test(
+    #     model=model,
+    #     ckpt_path=str(ckpt_path),
+    #     datamodule=data_module,
+    # )
 
 
 if __name__ == "__main__":  # pragma: no cover
@@ -103,9 +103,11 @@ if __name__ == "__main__":  # pragma: no cover
         action="store_true",
         help="whether to run 1 train, val, test batch and program ends",
     )
+    parser.add_argument("--use_flair", action="store_true")
+    parser.add_argument("--in_channels", type=int, default=2)
     parser.add_argument("--X_image", type=str, choices=["t1.nii.gz", "t2.nii.gz"], default="t1.nii.gz")
     parser.add_argument("--y_image", type=str, choices=["t1.nii.gz", "t2.nii.gz"], default="t2.nii.gz")
-    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion"])
+    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion"], default="t1t2")
     parser.add_argument("--checkpoint_file", type=str, help="resume_from_checkpoint_file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()

@@ -5,6 +5,7 @@ from typing import List, Optional, Tuple
 
 import monai
 import random
+import torch
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
@@ -17,11 +18,12 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class BraTSDataset(Dataset, Randomizable):
-    def __init__(self, X_path: List[str], y_path: List[str], transform: Compose):
+    def __init__(self, X_path: List[str], y_path: List[str], transform: Compose, using_flair: bool):
         self.X_path = X_path
         self.y_path = y_path
         self.X_transform = transform
         self.y_transform = get_label_transforms()
+        self.using_flair = using_flair
 
     def __len__(self):
         return int(len(self.X_path))
@@ -43,15 +45,22 @@ class BraTSDataset(Dataset, Randomizable):
         X_img = apply_transform(self.X_transform, X_img)
         y_img = apply_transform(self.y_transform, y_img)
 
+        if self.using_flair:
+            X_fair_path = str(self.X_path[i]).replace("t1", "flair")
+            X_fair, compatible_meta = loadnifti(Path(X_fair_path))
+            X_fair_img = apply_transform(self.X_transform, X_fair)
+            X_img = torch.cat((X_img, X_fair_img), 0)
+
         return X_img, y_img
 
 
 class DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size: int, X_image: str, y_image: str):
+    def __init__(self, batch_size: int, X_image: str, y_image: str, using_flair: bool):
         super().__init__()
         self.batch_size = batch_size
         self.X_image = X_image
         self.y_image = y_image
+        self.using_flair = using_flair
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
@@ -63,8 +72,12 @@ class DataModule(pl.LightningDataModule):
 
         train_transforms = get_train_img_transforms()
         val_transforms = get_val_img_transforms()
-        self.train_dataset = BraTSDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
-        self.val_dataset = BraTSDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
+        self.train_dataset = BraTSDataset(
+            X_path=X_train, y_path=y_train, transform=train_transforms, using_flair=self.using_flair
+        )
+        self.val_dataset = BraTSDataset(
+            X_path=X_val, y_path=y_val, transform=val_transforms, using_flair=self.using_flair
+        )
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")
