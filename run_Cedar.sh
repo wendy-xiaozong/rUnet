@@ -36,10 +36,10 @@ cd work
 
 GPUS=4
 BATCH_SIZE=3
-TASK=diffusion   # t1t2
+TASK=t1t2   # diffusion
 IN_CHANNELS=2
-X_image=t2.nii.gz
-y_image=t1.nii.gz
+X_image=t1.nii.gz
+y_image=t2.nii.gz
 LEARNING_RATE=1e-3
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
