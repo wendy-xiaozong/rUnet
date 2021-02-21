@@ -88,8 +88,6 @@ class BrainSlices:
         nrows, ncols = 2, 3
 
         fig = plt.figure(figsize=(10, 5))
-        # need to change here
-        # 160 is a random number
         gs = gridspec.GridSpec(nrows, ncols)
         for i in range(0, nrows):
             ax1 = plt.subplot(gs[i * 2])

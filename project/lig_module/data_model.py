@@ -64,8 +64,8 @@ class DataModule(pl.LightningDataModule):
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
-        X = sorted(list(DATA_ROOT.glob(f"**/*{self.X_image}")))
-        y = sorted(list(DATA_ROOT.glob(f"**/*{self.y_image}")))
+        X = sorted(list(DATA_ROOT.glob(f"**/*{self.X_image}.nii.gz")))
+        y = sorted(list(DATA_ROOT.glob(f"**/*{self.y_image}.nii.gz")))
 
         random_state = random.randint(0, 100)
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)

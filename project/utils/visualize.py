@@ -56,23 +56,42 @@ def get_logger(logdir: Path) -> TensorBoardLogger:
 
 # https://www.tensorflow.org/tensorboard/image_summaries#logging_arbitrary_image_data
 class BrainSlices:
-    def __init__(self, lightning: LightningModule, img: Optional[Tensor], target: Tensor, prediction: Tensor):
+    def __init__(
+        self,
+        lightning: LightningModule,
+        img: Optional[Tensor],
+        target: Tensor,
+        prediction: Tensor,
+        input_img_type: str,
+        target_img_type: str,
+    ):
         self.lightning = lightning
         self.input_img: ndarray = img.cpu().detach().numpy().squeeze() if torch.is_tensor(img) else img
         self.target_img: ndarray = target.cpu().detach().numpy().squeeze() if torch.is_tensor(target) else target
         self.predict_img: ndarray = make_imgs(
             prediction.cpu().detach().numpy().squeeze() if torch.is_tensor(prediction) else prediction
         )
+        self.input_img_type = input_img_type
+        self.target_img_type = target_img_type
 
         si, sj, sk = self.input_img.shape[:3]
         i = si // 2
         j = sj // 2
         k = sk // 2
-        self.slices = [
-            self.get_slice(self.input_img, i, j, k),
-            self.get_slice(self.target_img, i, j, k),
-            self.get_slice(self.predict_img, i, j, k),
-        ]
+
+        if len(self.input_img.shape) == 3:
+            self.slices = [
+                self.get_slice(self.input_img, i, j, k),
+                self.get_slice(self.target_img, i, j, k),
+                self.get_slice(self.predict_img, i, j, k),
+            ]
+        else:
+            self.slices = [
+                self.get_slice(self.input_img[0], i, j, k),
+                self.get_slice(self.input_img[1], i, j, k),
+                self.get_slice(self.target_img, i, j, k),
+                self.get_slice(self.predict_img, i, j, k),
+            ]
 
         self.shape = np.array(self.input_img.shape)
 
@@ -87,18 +106,31 @@ class BrainSlices:
     #     return [input[i, ...], input[:, j, ...], input[:, :, k, ...]]
 
     def plot(self) -> Figure:
-        nrows, ncols = 3, 3  # one row for each slice position
+        nrows, ncols = len(self.slices), 3  # one row for each slice position
 
-        fig = plt.figure(figsize=(10, 6))
-        # need to change here
-        # 160 is a random number
+        fig = plt.figure(figsize=(12, 6))
         gs = gridspec.GridSpec(nrows, ncols)
-        for i in range(0, 3):
+        for i in range(0, nrows):
             ax1 = plt.subplot(gs[i * 3])
             ax2 = plt.subplot(gs[i * 3 + 1])
             ax3 = plt.subplot(gs[i * 3 + 2])
             axes = ax1, ax2, ax3
             self.plot_row(self.slices[i], axes)
+            for axis in axes:
+                if i == 0:
+                    axis.set_title(f"input image: {self.input_img_type}")
+                if len(self.slices.shape) == 4:
+                    if i == 1:
+                        axis.set_title(f"input image: flair")
+                    elif i == 2:
+                        axis.set_title(f"target image: {self.target_img_type}")
+                    else:
+                        axis.set_title(f"predict image: {self.target_img_type}")
+                else:
+                    if i == 1:
+                        axis.set_title(f"target image: {self.target_img_type}")
+                    else:
+                        axis.set_title(f"predict image: {self.target_img_type}")
 
         plt.tight_layout()
         return fig
@@ -251,9 +283,11 @@ def log_all_info(
     loss: float,
     batch_idx: int,
     state: str,
+    input_img_type: str,
+    target_img_type: str,
 ) -> None:
-    brainSlice = BrainSlices(module, img, target, preb)
+    brainSlice = BrainSlices(module, img, target, preb, input_img_type=input_img_type, target_img_type=target_img_type)
     fig = brainSlice.plot()
 
-    # fig.savefig("/home/jueqi/projects/def-jlevman/jueqi/rUnet/3/test.png")
+    fig.savefig("/home/jueqi/projects/def-jlevman/jueqi/rUnet/1/test.png")
     brainSlice.log(state, fig, loss, batch_idx)

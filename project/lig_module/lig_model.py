@@ -97,8 +97,6 @@ class LitModel(pl.LightningModule):
         predicts = logits.cpu().detach().numpy().squeeze()
 
         brain_mask = inputs[0] == inputs[0][0][0][0]
-        if batch_idx == 1:
-            print(f"brain mask shape: {brain_mask.shape}")
 
         pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
         targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
