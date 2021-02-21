@@ -45,7 +45,7 @@ class Transpose(Transform):
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
         img = np.transpose(img, (3, 0, 1, 2))
-        print(f"input shape after transpose")
+        print(f"input shape after transpose: {img.shape}")
         return img
 
 
