@@ -74,7 +74,7 @@ class BrainSlices:
         self.input_img_type = input_img_type
         self.target_img_type = target_img_type
 
-        si, sj, sk = self.input_img.shape[:3]
+        si, sj, sk = self.input_img.shape[1:]
         i = si // 2
         j = sj // 2
         k = sk // 2
@@ -125,12 +125,12 @@ class BrainSlices:
                     elif i == 2:
                         axis.set_title(f"target image: {self.target_img_type}")
                     else:
-                        axis.set_title(f"predict image: {self.target_img_type}")
+                        axis.set_title(f"predict image")
                 else:
                     if i == 1:
                         axis.set_title(f"target image: {self.target_img_type}")
                     else:
-                        axis.set_title(f"predict image: {self.target_img_type}")
+                        axis.set_title(f"predict image")
 
         plt.tight_layout()
         return fig
