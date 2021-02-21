@@ -46,7 +46,11 @@ class BraTSDataset(Dataset, Randomizable):
         y_img = apply_transform(self.y_transform, y_img)
 
         if self.using_flair:
-            X_fair_path = str(self.X_path[i]).replace("t1", "flair")
+            X_path_str = str(self.X_path[i])
+            if "t1" in X_path_str:
+                X_fair_path = X_path_str.replace("t1", "flair")
+            else:
+                X_fair_path = X_path_str.replace("t2", "flair")
             X_fair, compatible_meta = loadnifti(Path(X_fair_path))
             X_fair_img = apply_transform(self.X_transform, X_fair)
             X_img = torch.cat((X_img, X_fair_img), 0)
