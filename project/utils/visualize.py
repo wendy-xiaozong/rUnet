@@ -119,7 +119,7 @@ class BrainSlices:
             for axis in axes:
                 if i == 0:
                     axis.set_title(f"input image: {self.input_img_type}")
-                if len(self.slices.shape) == 4:
+                if len(self.slices) == 4:
                     if i == 1:
                         axis.set_title(f"input image: flair")
                     elif i == 2:
