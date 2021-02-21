@@ -289,5 +289,5 @@ def log_all_info(
     brainSlice = BrainSlices(module, img, target, preb, input_img_type=input_img_type, target_img_type=target_img_type)
     fig = brainSlice.plot()
 
-    fig.savefig("/home/jueqi/projects/def-jlevman/jueqi/rUnet/1/test.png")
+    # fig.savefig("/home/jueqi/projects/def-jlevman/jueqi/rUnet/1/test.png")
     brainSlice.log(state, fig, loss, batch_idx)
