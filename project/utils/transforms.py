@@ -49,14 +49,16 @@ class Transpose(Transform):
         return img
 
 
-class Resize3D(Transform):
-    def __init__(
-        self,
-    ) -> None:
-        pass
+# class Resize3D(Transform):
+#     def __init__(
+#         self,
+#     ) -> None:
+#         pass
 
-    def __call__(self, img: np.ndarray) -> np.ndarray:
-        return img
+#     def __call__(self, img: np.ndarray) -> np.ndarray:
+#         for slice in img:
+
+#         return img
 
 
 def get_diffusion_preprocess() -> List:

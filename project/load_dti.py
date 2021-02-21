@@ -14,3 +14,5 @@ if __name__ == "__main__":
     preprocess = get_diffusion_preprocess()
 
     X_img = apply_transform(preprocess, X_img)
+
+    print(f"X shape after transform: {X_img.shape}")
