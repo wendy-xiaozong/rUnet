@@ -56,8 +56,8 @@ class DataModule_Diffusion(pl.LightningDataModule):
         # self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
         # self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
 
-        self.train_dataset = DiffusionDataset(X_path=X, y_path=y, transform=preprocess)
-        self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
+        self.train_dataset = DiffusionDataset(X_path=X, y_path=y, X_transform=preprocess)
+        self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, X_transform=preprocess)
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")
