@@ -1,6 +1,5 @@
 from monai.transforms import LoadNifti, apply_transform
 from utils.const import DIFFUSION_INPUT, DIFFUSION_LABEL
-from lig_module import DiffusionDataset
 from utils.transforms import get_diffusion_preprocess
 
 
