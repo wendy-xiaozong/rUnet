@@ -106,7 +106,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--use_flair", action="store_true")
     parser.add_argument("--in_channels", type=int, default=2)
     parser.add_argument("--X_image", type=str, choices=["t1", "t2"], default="t1")
-    parser.add_argument("--y_image", type=str, choices=["t1", "t2"], default="t2)
+    parser.add_argument("--y_image", type=str, choices=["t1", "t2"], default="t2")
     parser.add_argument("--task", type=str, choices=["t1t2", "diffusion"], default="t1t2")
     parser.add_argument("--checkpoint_file", type=str, help="resume_from_checkpoint_file")
     parser = LitModel.add_model_specific_args(parser)
