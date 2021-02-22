@@ -71,7 +71,9 @@ def main(hparams: Namespace) -> None:
 
     if hparams.task == "t1t2":
         model = LitModel(hparams)
-        data_module = DataModule(hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image, using_flair=True)
+        data_module = DataModule(
+            hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image, using_flair=hparams.use_flair
+        )
     elif hparams.task == "diffusion":
         model = LitModel_Diffusion(hparams)
         data_module = DataModule_Diffusion(hparams.batch_size)
