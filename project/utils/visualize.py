@@ -74,18 +74,21 @@ class BrainSlices:
         self.input_img_type = input_img_type
         self.target_img_type = target_img_type
 
-        si, sj, sk = self.input_img.shape[1:]
-        i = si // 2
-        j = sj // 2
-        k = sk // 2
-
         if len(self.input_img.shape) == 3:
+            si, sj, sk = self.input_img.shape
+            i = si // 2
+            j = sj // 2
+            k = sk // 2
             self.slices = [
                 self.get_slice(self.input_img, i, j, k),
                 self.get_slice(self.target_img, i, j, k),
                 self.get_slice(self.predict_img, i, j, k),
             ]
         else:
+            si, sj, sk = self.input_img.shape[1:]
+            i = si // 2
+            j = sj // 2
+            k = sk // 2
             self.slices = [
                 self.get_slice(self.input_img[0], i, j, k),
                 self.get_slice(self.input_img[1], i, j, k),
