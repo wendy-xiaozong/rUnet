@@ -58,7 +58,6 @@ class LitModel(pl.LightningModule):
 
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
-
         logits = self(inputs)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
 
@@ -101,7 +100,10 @@ class LitModel(pl.LightningModule):
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
-        brain_mask = inputs[0] == inputs[0][0][0][0]
+        if self.hparams.use_flair:
+            brain_mask = inputs[0] == inputs[0][0][0][0]
+        else:
+            brain_mask = inputs == inputs[0][0][0]
 
         pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
         targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
