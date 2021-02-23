@@ -59,12 +59,13 @@ class BraTSDataset(Dataset, Randomizable):
 
 
 class DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size: int, X_image: str, y_image: str, using_flair: bool):
+    def __init__(self, batch_size: int, X_image: str, y_image: str, using_flair: bool, fine_tune: bool):
         super().__init__()
         self.batch_size = batch_size
         self.X_image = X_image
         self.y_image = y_image
         self.using_flair = using_flair
+        self.fine_tune = fine_tune
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
@@ -72,6 +73,11 @@ class DataModule(pl.LightningDataModule):
         y = sorted(list(DATA_ROOT.glob(f"**/*{self.y_image}.nii.gz")))
 
         random_state = random.randint(0, 100)
+
+        if self.fine_tune:
+            X = X[:300]
+            y = y[:300]
+
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)
 
         train_transforms = get_train_img_transforms()

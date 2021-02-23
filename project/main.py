@@ -72,7 +72,11 @@ def main(hparams: Namespace) -> None:
     if hparams.task == "t1t2":
         model = LitModel(hparams)
         data_module = DataModule(
-            hparams.batch_size, X_image=hparams.X_image, y_image=hparams.y_image, using_flair=hparams.use_flair
+            hparams.batch_size,
+            X_image=hparams.X_image,
+            y_image=hparams.y_image,
+            using_flair=hparams.use_flair,
+            fine_tune=hparams.fine_tune,
         )
     elif hparams.task == "diffusion":
         model = LitModel_Diffusion(hparams)
@@ -104,6 +108,11 @@ if __name__ == "__main__":  # pragma: no cover
         "--fast_dev_run",
         action="store_true",
         help="whether to run 1 train, val, test batch and program ends",
+    )
+    parser.add_argument(
+        "--fine_tune",
+        action="store_true",
+        help="using this mode to fine tune, only use 300 images here",
     )
     parser.add_argument("--use_flair", action="store_true")
     parser.add_argument("--in_channels", type=int, default=2)

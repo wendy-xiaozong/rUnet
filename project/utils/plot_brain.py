@@ -68,29 +68,31 @@ def plot_slices(
 if __name__ == "__main__":
     brains = sorted(list(PATH.glob("*.npz")))
 
-    targ_slices = []
-    pred_slices = []
+    # targ_slices = []
+    # pred_slices = []
     for brain in brains:
         data = np.load(brain)
         target = data["target"]
         predict = data["predict"]
-        cur_targ_slices = [target[64, ...], target[:, 64, :], target[..., 64]]
-        cur_pred_slices = [predict[64, ...], predict[:, 64, :], predict[..., 64]]
-        targs = np.concatenate(cur_targ_slices, axis=1)
-        preds = np.concatenate(cur_pred_slices, axis=1)
-        targ_slices.append(targs)
-        pred_slices.append(preds)
+        mask = target != target[0][0][0]
+        print(f"target mask mean: {np.mean(target[mask])}")
+        # cur_targ_slices = [target[64, ...], target[:, 64, :], target[..., 64]]
+        # cur_pred_slices = [predict[64, ...], predict[:, 64, :], predict[..., 64]]
+        # targs = np.concatenate(cur_targ_slices, axis=1)
+        # preds = np.concatenate(cur_pred_slices, axis=1)
+        # targ_slices.append(targs)
+        # pred_slices.append(preds)
 
-    clips = [5, 4.5, 4, 3.5, 3, 2, 1.8]
-    mae_dict = {}
+    # clips = [5, 4.5, 4, 3.5, 3, 2, 1.8]
+    # mae_dict = {}
 
-    for clip_min in clips:
-        for clip_max in clips:
-            print(f"clip_min: {clip_min}, clip_max: {clip_max}")
-            mae = plot_slices(pred_slices, targ_slices, clip_min, clip_max)
-            mae_dict[f"clip_min:{clip_min}, clip_max:{clip_max}"] = mae
+    # for clip_min in clips:
+    #     for clip_max in clips:
+    #         print(f"clip_min: {clip_min}, clip_max: {clip_max}")
+    #         mae = plot_slices(pred_slices, targ_slices, clip_min, clip_max)
+    #         mae_dict[f"clip_min:{clip_min}, clip_max:{clip_max}"] = mae
 
-    print(mae_dict)
+    # print(mae_dict)
 
-    for key, value in mae_dict.items():
-        print(f"{key}: {value}")
+    # for key, value in mae_dict.items():
+    #     print(f"{key}: {value}")

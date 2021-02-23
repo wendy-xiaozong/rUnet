@@ -10,7 +10,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 from torch import Tensor
-from torch.nn import Sigmoid, MSELoss, Softmax
+from torch.nn import Sigmoid, MSELoss, Softmax, L1Loss, SmoothL1Loss
 from monai.losses import DiceLoss
 from model.unet.unet import UNet
 from pytorch_lightning.utilities.parsing import AttributeDict
@@ -47,7 +47,12 @@ class LitModel(pl.LightningModule):
             use_bias=True,
         )
         self.sigmoid = Sigmoid()
-        self.criterion = MSELoss()
+        if self.hparams.loss == "l2":
+            self.criterion = MSELoss()
+        elif self.hparams.loss == "l1":
+            self.criterion = L1Loss(reduction="mean")
+        elif self.hparams.loss == "smoothl1":
+            self.criterion = SmoothL1Loss(beta=5.0, reduction="mean")
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
         self.clip_min = 2
@@ -59,7 +64,10 @@ class LitModel(pl.LightningModule):
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
         logits = self(inputs)
-        loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        ### before ###
+        # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        ### it should be ###
+        loss = self.criterion(logits.view(-1), targets.view(-1))
 
         if batch_idx == self.train_log_step:
             log_all_info(
@@ -80,7 +88,7 @@ class LitModel(pl.LightningModule):
         inputs, targets = batch
 
         logits = self(inputs)
-        loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        loss = self.criterion(logits.view(-1), targets.view(-1))
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
         if batch_idx == self.val_log_step:
@@ -189,7 +197,7 @@ class LitModel(pl.LightningModule):
     def add_model_specific_args(parent_parser: ArgumentParser) -> ArgumentParser:
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
         parser.add_argument("--learning_rate", type=float, default=1e-15)
-        # parser.add_argument("--loss", type=str, default="BCEWL", help="Loss Function")
+        parser.add_argument("--loss", type=str, choices=["l1", "l2", "smoothl1"], default="l2")
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
         # parser.add_argument("--deepth", type=int, default=4, help="the deepth of the unet")
