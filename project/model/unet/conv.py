@@ -47,7 +47,10 @@ class ConvolutionalBlock(nn.Module):
 
         activation_layer = None
         if activation is not None:
-            activation_layer = getattr(nn, activation)()
+            if activation == "ReLU":
+                activation_layer = getattr(nn, activation)()
+            elif activation == "LeakyReLU":
+                activation_layer = getattr(nn, activation)(0.2)
 
         self.add_if_not_none(block, conv_layer)
         self.add_if_not_none(block, norm_layer)

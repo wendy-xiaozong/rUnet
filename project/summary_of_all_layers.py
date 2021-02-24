@@ -16,7 +16,7 @@ class Model(pl.LightningModule):
             out_classes=1,
             dimensions=3,
             padding_mode="zeros",
-            activation="ReLU",
+            activation="LeakyReLU",
             conv_num_in_layer=[1, 2, 3, 3, 3],
             residual=False,
             out_channels_first_layer=16,

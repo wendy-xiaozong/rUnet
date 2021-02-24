@@ -36,7 +36,7 @@ class LitModel(pl.LightningModule):
             out_classes=1,
             dimensions=3,
             padding_mode="zeros",
-            activation="ReLU",
+            activation=hparams.activation,
             conv_num_in_layer=[1, 2, 3, 3, 3],
             residual=False,
             out_channels_first_layer=16,
@@ -198,10 +198,11 @@ class LitModel(pl.LightningModule):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
         parser.add_argument("--learning_rate", type=float, default=1e-15)
         parser.add_argument("--loss", type=str, choices=["l1", "l2", "smoothl1"], default="l2")
+        parser.add_argument("--activation", type=str, choices=["ReLU", "LeakyReLU"], default="l2")
+        parser.add_argument("--normalization", type=str, choices=["Batch", "Group", "InstanceNorm3d"], default="Batch")
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
         # parser.add_argument("--deepth", type=int, default=4, help="the deepth of the unet")
-        # parser.add_argument("--normalization", type=str, default="Batch")
         # parser.add_argument("--kernel_size", type=int, default=3, help="the kernal size")
         # parser.add_argument("--model", type=str, default="ResUnet")
         # parser.add_argument("--downsampling_type", type=str, default="max")
