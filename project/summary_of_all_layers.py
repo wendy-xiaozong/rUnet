@@ -21,7 +21,7 @@ class Model(pl.LightningModule):
             residual=False,
             out_channels_first_layer=16,
             kernal_size=5,
-            normalization="Batch",
+            normalization="InstanceNorm3d",
             downsampling_type="max",
             use_bias=False,
         )
