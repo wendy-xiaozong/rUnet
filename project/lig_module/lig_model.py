@@ -50,9 +50,9 @@ class LitModel(pl.LightningModule):
         if self.hparams.loss == "l2":
             self.criterion = MSELoss()
         elif self.hparams.loss == "l1":
-            self.criterion = L1Loss(reduction="mean")
+            self.criterion = L1Loss()
         elif self.hparams.loss == "smoothl1":
-            self.criterion = SmoothL1Loss(beta=5.0, reduction="mean")
+            self.criterion = SmoothL1Loss()
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
         self.clip_min = 2
