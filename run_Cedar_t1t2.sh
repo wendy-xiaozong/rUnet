@@ -36,7 +36,7 @@ cd work
 
 GPUS=4
 BATCH_SIZE=3
-LOSS=smoothl1 # l1 l2
+LOSS=l2 # l1  smoothl1
 TASK=t1t2   # diffusion
 IN_CHANNELS=2
 X_image=t2

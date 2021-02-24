@@ -2,6 +2,9 @@ import os
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
+import optuna
+from optuna.integration import PyTorchLightningPruningCallback
+
 import pytorch_lightning as pl
 from torch.utils import data
 from utils.const import COMPUTECANADA
