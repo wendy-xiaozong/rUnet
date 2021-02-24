@@ -36,7 +36,7 @@ cd work
 
 GPUS=4
 BATCH_SIZE=3
-LOSS=l2 # l1 smoothl1
+LOSS=l2 # l1 l2 smoothl1
 TASK=t1t2   # diffusion
 ACTIVATION=LeakyReLU # ReLU
 IN_CHANNELS=2
@@ -52,7 +52,8 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --use_flair \
-       --loss=$LOSS \
+       --loss="$LOSS" \
+       --activation="$ACTIVATION" \
        --fine_tune \
        --batch_size=$BATCH_SIZE \
        --X_image="$X_image" \
