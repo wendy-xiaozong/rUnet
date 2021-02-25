@@ -46,7 +46,7 @@ def main(hparams: Namespace) -> None:
     checkpoint_callback = ModelCheckpoint(
         filepath=str(checkpoint_file),
         monitor="val_MAE_mask",
-        save_top_k=3,
+        save_top_k=1,
         verbose=True,
         mode="min",
         save_weights_only=False,
