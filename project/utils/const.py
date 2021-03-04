@@ -16,14 +16,24 @@ if TMP:  # running inside Compute Canada
     IN_COMPUTE_CAN_JOB = True
 
 if COMPUTECANADA:
+    # fmt: off
     DATA_ROOT = Path(str(TMP)).resolve() / "work"
     DIFFUSION_INPUT = DATA_ROOT / "input"
     DIFFUSION_LABEL = DATA_ROOT / "label"
+    ADNI_SC  = DATA_ROOT / "SC"
+    ADNI_M06 = DATA_ROOT / "M06"
+    ADNI_M12 = DATA_ROOT / "M12"
+    ADNI_M24 = DATA_ROOT / "M24"
 else:
     DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
     # DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data" / "Diffusion"
     DIFFUSION_INPUT = DATA_ROOT / "Diffusion" / "input"
     DIFFUSION_LABEL = DATA_ROOT / "Diffusion" / "label"
-
+    DATA_ROOT= DATA_ROOT / "ADNI"
+    ADNI_SC  = DATA_ROOT / "SC"
+    ADNI_M06 = DATA_ROOT / "M06"
+    ADNI_M12 = DATA_ROOT / "M12"
+    ADNI_M24 = DATA_ROOT / "M24"
+    # fmt: on
 
 IMAGESIZE = 128
