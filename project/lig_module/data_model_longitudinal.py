@@ -1,0 +1,116 @@
+import functools
+import os
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+import monai
+import random
+import torch
+import numpy as np
+import pandas as pd
+import pytorch_lightning as pl
+from utils.const import ADNI_LIST
+from monai.transforms import Compose
+from utils.transforms import get_train_img_transforms, get_val_img_transforms, get_label_transforms
+from sklearn.model_selection import train_test_split
+from monai.transforms import LoadNifti, Randomizable, apply_transform
+from torch.utils.data import DataLoader, Dataset
+
+
+class LongitudinalDataset(Dataset, Randomizable):
+    def __init__(self, num_scan_using: int, transform: Compose):
+        self.num_scan_using = num_scan_using
+        self.X_transform = transform
+        self.y_transform = get_label_transforms()
+
+    def __len__(self):
+        return int(len(self.X_path))
+
+    # What is this used for?
+    def randomize(self) -> None:
+        MAX_SEED = np.iinfo(np.uint32).max + 1
+        self._seed = self.R.randint(MAX_SEED, dtype="uint32")
+
+    def __getitem__(self, i):
+        self.randomize()
+        loadnifti = LoadNifti()
+        X_img, compatible_meta = loadnifti(self.X_path[i])
+        y_img, compatible_meta = loadnifti(self.y_path[i])
+
+        if isinstance(self.X_transform, Randomizable):
+            self.X_transform.set_random_state(seed=self._seed)
+            self.y_transform.set_random_state(seed=self._seed)
+        X_img = apply_transform(self.X_transform, X_img)
+        y_img = apply_transform(self.y_transform, y_img)
+
+        if self.using_flair:
+            X_path_str = str(self.X_path[i])
+            if "t1" in X_path_str:
+                X_fair_path = X_path_str.replace("t1", "flair")
+            else:
+                X_fair_path = X_path_str.replace("t2", "flair")
+            X_fair, compatible_meta = loadnifti(Path(X_fair_path))
+            X_fair_img = apply_transform(self.X_transform, X_fair)
+            X_img = torch.cat((X_img, X_fair_img), 0)
+
+        return X_img, y_img
+
+
+class DataModuleLongitudinal(pl.LightningDataModule):
+    def __init__(self, batch_size: int, num_scan_training: int):
+        super().__init__()
+        self.batch_size = batch_size
+        self.num_scan_training = num_scan_training
+
+    # perform on every GPU
+    def setup(self, stage: Optional[str] = None) -> None:
+        y_list_all = set(list(ADNI_LIST[0].glob("**/*.nii.gz")))
+        y_list_mask = set(list(ADNI_LIST[0].glob("**/*_mask.nii.gz")))
+        y = sorted(list(y_list_all - y_list_mask))
+
+        if self.num_scan_training == 1:
+            X_M12 = ADNI_LIST[1]
+            X = sorted(list(X_M12.glob("**/*.nii.mgz")))
+        elif self.num_scan_training == 2:
+            X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
+            X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(
+                list(X_M06.glob("**/*.nii.mgz"))
+            )
+            X = zip(X_M12_files, X_M06_files)
+        elif self.num_scan_training == 3:
+            X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
+            X_M12_files, X_M06_files, X_SC_files = (
+                sorted(list(X_M12.glob("**/*.nii.mgz"))),
+                sorted(list(X_M06.glob("**/*.nii.mgz"))),
+                sorted(list(X_SC.glob("**/*.nii.mgz"))),
+            )
+            X = zip(X_M12_files, X_M06_files, X_SC_files)
+
+        random_state = random.randint(0, 100)
+
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)
+
+        train_transforms = get_train_img_transforms()
+        val_transforms = get_val_img_transforms()
+        self.train_dataset = BraTSDataset(
+            X_path=X_train, y_path=y_train, transform=train_transforms, using_flair=self.using_flair
+        )
+        self.val_dataset = BraTSDataset(
+            X_path=X_val, y_path=y_val, transform=val_transforms, using_flair=self.using_flair
+        )
+
+    def train_dataloader(self):
+        print(f"get {len(self.train_dataset)} training 3D image!")
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=8,
+        )
+
+    def val_dataloader(self):
+        print(f"get {len(self.val_dataset)} validation 3D image!")
+        return DataLoader(self.val_dataset, batch_size=1, num_workers=8)
+
+    def test_dataloader(self):
+        print(f"get {len(self.val_dataset)} validation 3D image!")
+        return DataLoader(self.val_dataset, batch_size=1, num_workers=8)
