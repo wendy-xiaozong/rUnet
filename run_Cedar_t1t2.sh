@@ -4,7 +4,7 @@
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
 #SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
-#SBATCH --time=01-00:00     # time (DD-HH:MM)
+#SBATCH --time=00-02:00     # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
 
@@ -36,24 +36,26 @@ cd work
 
 GPUS=4
 BATCH_SIZE=3
-LOSS=l2 # l1 l2 smoothl1
+LOSS=l1 # l1 l2 smoothl1
 TASK=t1t2   # diffusion
-ACTIVATION=ReLU # LeakyReLU
+ACTIVATION=LeakyReLU # LeakyReLU
 NORMALIZATION=Batch # Batch Group
+WEIGHT_DECAY=1e-9
 IN_CHANNELS=2
 X_image=t1
 y_image=t2
-LEARNING_RATE=5e-10
+LEARNING_RATE=1e-5
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/6/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --use_flair \
        --loss="$LOSS" \
+       --weight_decay=$WEIGHT_DECAY \
        --activation="$ACTIVATION" \
        --normalization="$NORMALIZATION" \
        --fine_tune \
