@@ -39,7 +39,7 @@ BATCH_SIZE=3
 LOSS=l2 # l1 l2 smoothl1
 TASK=t1t2   # diffusion
 ACTIVATION=LeakyReLU # LeakyReLU
-NORMALIZATION=InstanceNorm3d # Batch Group InstanceNorm3d
+NORMALIZATION=Batch # Batch Group InstanceNorm3d
 WEIGHT_DECAY=1e-8
 IN_CHANNELS=2
 X_image=t1
@@ -55,7 +55,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --in_channels=$IN_CHANNELS \
        --use_flair \
        --loss="$LOSS" \
-       --WEIGHT_DECAY=$WEIGHT_DECAY \
+       --weight_decay=$WEIGHT_DECAY \
        --activation="$ACTIVATION" \
        --normalization="$NORMALIZATION" \
        --fine_tune \
