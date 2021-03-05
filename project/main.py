@@ -2,9 +2,6 @@ import os
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
-import optuna
-from optuna.integration import PyTorchLightningPruningCallback
-
 import pytorch_lightning as pl
 from torch.utils import data
 from utils.const import COMPUTECANADA
@@ -13,24 +10,12 @@ from lig_module.data_model_dti import DataModule_Diffusion
 from lig_module.lig_model import LitModel
 from lig_module.lig_model_dti import LitModel_Diffusion
 
-from pytorch_lightning import Trainer, loggers, Callback
+from pytorch_lightning import Trainer, loggers
 from pytorch_lightning.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
 )
-
-DIR = os.getcwd()
-MODEL_DIR = os.path.join(DIR, "result")
-
-
-class MetricsCallback(Callback):
-    def __init__(self):
-        super().__init__()
-        self.metrics = []
-
-    def on_validation_end(self, trainer, pl_module):
-        self.metrics.append(trainer.callback_metrics)
 
 
 def main(hparams: Namespace) -> None:
@@ -78,7 +63,7 @@ def main(hparams: Namespace) -> None:
         # resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
-        max_epochs=100000,
+        max_epochs=100,
         # max_epochs=287,
         # max_epochs=1,
         # auto_scale_batch_size="binsearch", # for auto scaling of batch size
@@ -137,25 +122,5 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--checkpoint_file", type=str, help="resume from checkpoint file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()
-
-    pruner = optuna.pruners.MedianPruner()
-    study = optuna.create_study(direction="maximize", pruner=pruner)
-    study.optimize(objective, n_trials=1000, timeout=600)
-
-    print("Number of finished trials: {}".format(len(study.trials)))
-
-    print("Best trial:")
-    trial = study.best_trial
-
-    print("  Value: {}".format(trial.value))
-
-    print("  Params: ")
-    for key, value in trial.params.items():
-        print("    {}: {}".format(key, value))
-
-    # offers a number of high-level operations on files and collections of files. In particular,
-    # functions are provided which support file copying and removal. For operations on individual
-    # files, see also the os module.
-    shutil.rmtree(MODEL_DIR)
 
     main(hparams)
