@@ -41,7 +41,7 @@ class LitModel(pl.LightningModule):
             residual=False,
             out_channels_first_layer=16,
             kernal_size=5,
-            normalization="Batch",
+            normalization=hparams.normalization,
             downsampling_type="max",
             use_sigmoid=False,
             use_bias=True,
@@ -182,7 +182,9 @@ class LitModel(pl.LightningModule):
         print(f"average absolute error on mask: {average}")
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), lr=self.hparams.learning_rate, weight_decay=self.hparams.weight_decay
+        )
         # scheduler = ReduceLROnPlateau(optimizer, threshold=1e-10)
         lr_dict = {
             "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),
@@ -199,7 +201,10 @@ class LitModel(pl.LightningModule):
         parser.add_argument("--learning_rate", type=float, default=1e-15)
         parser.add_argument("--loss", type=str, choices=["l1", "l2", "smoothl1"], default="l2")
         parser.add_argument("--activation", type=str, choices=["ReLU", "LeakyReLU"], default="LeakyReLU")
-        parser.add_argument("--normalization", type=str, choices=["Batch", "Group", "InstanceNorm3d"], default="InstanceNorm3d")
+        parser.add_argument(
+            "--normalization", type=str, choices=["Batch", "Group", "InstanceNorm3d"], default="InstanceNorm3d"
+        )
+        parser.add_argument("--weight_decay", type=float, default=1e-6)
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
         # parser.add_argument("--deepth", type=int, default=4, help="the deepth of the unet")
