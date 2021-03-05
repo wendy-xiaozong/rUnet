@@ -29,13 +29,10 @@ def main(hparams: Namespace) -> None:
     if COMPUTECANADA:
         cur_path = Path(__file__).resolve().parent
         default_root_dir = cur_path
-        checkpoint_file = (
-            Path(__file__).resolve().parent
-            / "checkpoint/{epoch}-{val_MAE_mask:0.5f}-{val_MAE:0.5f}"
-        )
+        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_MAE_mask:0.5f}-{val_MAE:0.5f}"
         if not os.path.exists(Path(__file__).resolve().parent / "checkpoint"):
             os.mkdir(Path(__file__).resolve().parent / "checkpoint")
-    else:
+    else:   
         default_root_dir = Path("./log")
         if not os.path.exists(default_root_dir):
             os.mkdir(default_root_dir)
@@ -103,9 +100,7 @@ def main(hparams: Namespace) -> None:
 if __name__ == "__main__":  # pragma: no cover
     parser = ArgumentParser(description="Trainer args", add_help=False)
     parser.add_argument("--gpus", type=int, default=1, help="how many gpus")
-    parser.add_argument(
-        "--batch_size", type=int, default=1, help="Batch size", dest="batch_size"
-    )
+    parser.add_argument("--batch_size", type=int, default=1, help="Batch size", dest="batch_size")
     parser.add_argument(
         "--tensor_board_logger",
         dest="TensorBoardLogger",
@@ -126,12 +121,8 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--in_channels", type=int, default=2)
     parser.add_argument("--X_image", type=str, choices=["t1", "t2"], default="t1")
     parser.add_argument("--y_image", type=str, choices=["t1", "t2"], default="t2")
-    parser.add_argument(
-        "--task", type=str, choices=["t1t2", "diffusion"], default="t1t2"
-    )
-    parser.add_argument(
-        "--checkpoint_file", type=str, help="resume from checkpoint file"
-    )
+    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion"], default="t1t2")
+    parser.add_argument("--checkpoint_file", type=str, help="resume from checkpoint file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()
 
