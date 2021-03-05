@@ -11,14 +11,24 @@ import pandas as pd
 import pytorch_lightning as pl
 from utils.const import DATA_ROOT
 from monai.transforms import Compose
-from utils.transforms import get_train_img_transforms, get_val_img_transforms, get_label_transforms
+from utils.transforms import (
+    get_train_img_transforms,
+    get_val_img_transforms,
+    get_label_transforms,
+)
 from sklearn.model_selection import train_test_split
 from monai.transforms import LoadNifti, Randomizable, apply_transform
 from torch.utils.data import DataLoader, Dataset
 
 
 class BraTSDataset(Dataset, Randomizable):
-    def __init__(self, X_path: List[str], y_path: List[str], transform: Compose, using_flair: bool):
+    def __init__(
+        self,
+        X_path: List[str],
+        y_path: List[str],
+        transform: Compose,
+        using_flair: bool,
+    ):
         self.X_path = X_path
         self.y_path = y_path
         self.X_transform = transform
@@ -59,7 +69,14 @@ class BraTSDataset(Dataset, Randomizable):
 
 
 class DataModule(pl.LightningDataModule):
-    def __init__(self, batch_size: int, X_image: str, y_image: str, using_flair: bool, fine_tune: bool):
+    def __init__(
+        self,
+        batch_size: int,
+        X_image: str,
+        y_image: str,
+        using_flair: bool,
+        fine_tune: bool,
+    ):
         super().__init__()
         self.batch_size = batch_size
         self.X_image = X_image
@@ -78,15 +95,23 @@ class DataModule(pl.LightningDataModule):
             X = X[:300]
             y = y[:300]
 
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y, test_size=0.2, random_state=random_state
+        )
 
         train_transforms = get_train_img_transforms()
         val_transforms = get_val_img_transforms()
         self.train_dataset = BraTSDataset(
-            X_path=X_train, y_path=y_train, transform=train_transforms, using_flair=self.using_flair
+            X_path=X_train,
+            y_path=y_train,
+            transform=train_transforms,
+            using_flair=self.using_flair,
         )
         self.val_dataset = BraTSDataset(
-            X_path=X_val, y_path=y_val, transform=val_transforms, using_flair=self.using_flair
+            X_path=X_val,
+            y_path=y_val,
+            transform=val_transforms,
+            using_flair=self.using_flair,
         )
 
     def train_dataloader(self):

@@ -97,7 +97,13 @@ class LitModel_Diffusion(pl.LightningModule):
         predicts[brain_mask] = 0
         if batch_idx == 1:
             log_all_info(
-                module=self, img=inputs, target=targets, preb=predicts, loss=0.0, batch_idx=batch_idx, state="tmp"
+                module=self,
+                img=inputs,
+                target=targets,
+                preb=predicts,
+                loss=0.0,
+                batch_idx=batch_idx,
+                state="tmp",
             )
         diff_tensor = np.absolute(predicts - targets)
         diff_average = np.sum(diff_tensor) / num_non_zero
@@ -108,7 +114,9 @@ class LitModel_Diffusion(pl.LightningModule):
         print(f"average absolute error: {average}")
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), lr=self.hparams.learning_rate
+        )
         # scheduler = ReduceLROnPlateau(optimizer, threshold=1e-10)
         lr_dict = {
             "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),
