@@ -40,7 +40,7 @@ LOSS=l1 # l1 l2 smoothl1
 TASK=t1t2   # diffusion
 ACTIVATION=LeakyReLU # LeakyReLU
 NORMALIZATION=Batch # Batch Group
-WEIGHT_DECAY=1e-8
+WEIGHT_DECAY=1e-7
 IN_CHANNELS=2
 X_image=t1
 y_image=t2
@@ -50,7 +50,7 @@ LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/2/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --use_flair \
