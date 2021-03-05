@@ -4,7 +4,7 @@
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
 #SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
-#SBATCH --time=01-00:00     # time (DD-HH:MM)
+#SBATCH --time=00-02:00     # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
 
@@ -38,7 +38,7 @@ GPUS=4
 BATCH_SIZE=3
 LOSS=l2 # l1 l2 smoothl1
 TASK=t1t2   # diffusion
-ACTIVATION=ReLU # LeakyReLU
+ACTIVATION=LeakyReLU # LeakyReLU
 NORMALIZATION=InstanceNorm3d # Batch Group InstanceNorm3d
 WEIGHT_DECAY=1e-8
 IN_CHANNELS=2
