@@ -44,7 +44,7 @@ WEIGHT_DECAY=1e-8
 IN_CHANNELS=2
 X_image=t1
 y_image=t2
-LEARNING_RATE=5e-10
+LEARNING_RATE=1e-5
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 
 # run script

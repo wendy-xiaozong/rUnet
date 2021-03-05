@@ -63,7 +63,7 @@ def main(hparams: Namespace) -> None:
         # resume_from_checkpoint=str(Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file),
         default_root_dir=str(default_root_dir),
         logger=tb_logger,
-        max_epochs=100,
+        max_epochs=100000,
         # max_epochs=287,
         # max_epochs=1,
         # auto_scale_batch_size="binsearch", # for auto scaling of batch size
@@ -79,6 +79,9 @@ def main(hparams: Namespace) -> None:
             fine_tune=hparams.fine_tune,
         )
     elif hparams.task == "diffusion":
+        model = LitModel_Diffusion(hparams)
+        data_module = DataModule_Diffusion(hparams.batch_size)
+    elif hparams.task == "longitudinal":
         model = LitModel_Diffusion(hparams)
         data_module = DataModule_Diffusion(hparams.batch_size)
 
