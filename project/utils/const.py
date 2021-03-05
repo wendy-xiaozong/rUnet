@@ -20,20 +20,20 @@ if COMPUTECANADA:
     DATA_ROOT = Path(str(TMP)).resolve() / "work"
     DIFFUSION_INPUT = DATA_ROOT / "input"
     DIFFUSION_LABEL = DATA_ROOT / "label"
-    ADNI_SC  = DATA_ROOT / "SC"
-    ADNI_M06 = DATA_ROOT / "M06"
-    ADNI_M12 = DATA_ROOT / "M12"
-    ADNI_M24 = DATA_ROOT / "M24"
+    ADNI_SC  = DATA_ROOT / "SC_registration"
+    ADNI_M06 = DATA_ROOT / "M06_registration"
+    ADNI_M12 = DATA_ROOT / "M12_registration"
+    ADNI_M24 = DATA_ROOT / "M24_registration"
 else:
     DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data"
     # DATA_ROOT = Path(__file__).resolve().parent.parent.parent / "data" / "Diffusion"
     DIFFUSION_INPUT = DATA_ROOT / "Diffusion" / "input"
     DIFFUSION_LABEL = DATA_ROOT / "Diffusion" / "label"
-    DATA_ROOT= DATA_ROOT / "ADNI"
-    ADNI_SC  = DATA_ROOT / "SC"
-    ADNI_M06 = DATA_ROOT / "M06"
-    ADNI_M12 = DATA_ROOT / "M12"
-    ADNI_M24 = DATA_ROOT / "M24"
+    ADNI_SC  = DATA_ROOT / "ADNI" / "SC_registration"
+    ADNI_M06 = DATA_ROOT / "ADNI" / "M06_registration"
+    ADNI_M12 = DATA_ROOT / "ADNI" / "M12_registration"
+    ADNI_M24 = DATA_ROOT / "ADNI" / "M24_registration"
     # fmt: on
 
 IMAGESIZE = 128
+ADNI_LIST = [ADNI_M24, ADNI_M12, ADNI_M06, ADNI_SC]

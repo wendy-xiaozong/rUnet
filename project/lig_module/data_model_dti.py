@@ -39,7 +39,7 @@ class DiffusionDataset(Dataset):
         return X_img, y_img
 
 
-class DataModule_Diffusion(pl.LightningDataModule):
+class DataModuleDiffusion(pl.LightningDataModule):
     def __init__(self, batch_size: int):
         super().__init__()
         self.batch_size = batch_size

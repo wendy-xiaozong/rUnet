@@ -15,9 +15,9 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from utils.visualize_dti import log_all_info
 
 
-class LitModel_Diffusion(pl.LightningModule):
+class LitModelDiffusion(pl.LightningModule):
     def __init__(self, hparams: AttributeDict):
-        super(LitModel_Diffusion, self).__init__()
+        super(LitModelDiffusion, self).__init__()
         self.hparams = hparams
         self.model = UNet(
             in_channels=288,

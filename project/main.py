@@ -6,9 +6,11 @@ import pytorch_lightning as pl
 from torch.utils import data
 from utils.const import COMPUTECANADA
 from lig_module.data_model import DataModule
-from lig_module.data_model_dti import DataModule_Diffusion
+from lig_module.data_model_dti import DataModuleDiffusion
+from lig_module.data_model_longitudinal import DataModuleLongitudinal
 from lig_module.lig_model import LitModel
-from lig_module.lig_model_dti import LitModel_Diffusion
+from lig_module.lig_model_dti import LitModelDiffusion
+from lig_module.lig_model_longitudinal import LitModelLongitudinal
 
 from pytorch_lightning import Trainer, loggers
 from pytorch_lightning.callbacks import (
@@ -79,11 +81,11 @@ def main(hparams: Namespace) -> None:
             fine_tune=hparams.fine_tune,
         )
     elif hparams.task == "diffusion":
-        model = LitModel_Diffusion(hparams)
-        data_module = DataModule_Diffusion(hparams.batch_size)
+        model = LitModelDiffusion(hparams)
+        data_module = DataModuleDiffusion(hparams.batch_size)
     elif hparams.task == "longitudinal":
-        model = LitModel_Diffusion(hparams)
-        data_module = DataModule_Diffusion(hparams.batch_size)
+        model = LitModelLongitudinal(hparams)
+        data_module = DataModuleLongitudinal(hparams.batch_size)
 
     trainer.fit(model, data_module)
     # ckpt_path = Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file
@@ -121,7 +123,7 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--in_channels", type=int, default=2)
     parser.add_argument("--X_image", type=str, choices=["t1", "t2"], default="t1")
     parser.add_argument("--y_image", type=str, choices=["t1", "t2"], default="t2")
-    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion"], default="t1t2")
+    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion", "longitudinal"], default="longitudinal")
     parser.add_argument("--checkpoint_file", type=str, help="resume from checkpoint file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()

@@ -27,9 +27,9 @@ def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> n
     return scaled
 
 
-class LitModel(pl.LightningModule):
+class LitModelLongitudinal(pl.LightningModule):
     def __init__(self, hparams: AttributeDict):
-        super(LitModel, self).__init__()
+        super(LitModelLongitudinal, self).__init__()
         self.hparams = hparams
         self.model = UNet(
             in_channels=hparams.in_channels,
@@ -204,7 +204,7 @@ class LitModel(pl.LightningModule):
         parser.add_argument(
             "--normalization", type=str, choices=["Batch", "Group", "InstanceNorm3d"], default="InstanceNorm3d"
         )
-        parser.add_argument("--weight_decay", type=float, default=1e-6)
+        parser.add_argument("--weight_decay", type=float, default=1e-8)
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
         # parser.add_argument("--deepth", type=int, default=4, help="the deepth of the unet")
