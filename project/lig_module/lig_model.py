@@ -91,7 +91,7 @@ class LitModel(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1))
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        if batch_idx == self.val_log_step:
+        if self.current_epoch % 100 == 0 and self.current_epoch != 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
@@ -99,7 +99,7 @@ class LitModel(pl.LightningModule):
                 preb=logits[0],
                 loss=loss,
                 batch_idx=batch_idx,
-                state="train",
+                state="val",
                 input_img_type=self.hparams.X_image,
                 target_img_type=self.hparams.y_image,
             )

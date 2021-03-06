@@ -78,9 +78,7 @@ def get_preprocess(is_label: bool) -> List:
         return [
             Crop(),
             NormalizeIntensity(nonzero=True),
-            # I really donno why I need to the unsqueeze things
-            # maybe the way I use the data augmentation is the standard way(?)
-            # but it works ¯\_(ツ)_/¯
+            # Channel
             Unsqueeze(),
             SpatialPad(spatial_size=[193, 193, 193], method="symmetric", mode="constant"),
             Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
