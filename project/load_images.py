@@ -48,22 +48,22 @@ if __name__ == "__main__":
     if NUM == 1:
         X_M12 = ADNI_LIST[1]
         X = sorted(list(X_M12.glob("**/*.nii.mgz")))
-    elif NUM == 2:
-        X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
-        X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(list(X_M06.glob("**/*.nii.mgz")))
-        X = []
-        for m12, m06 in zip(X_M12_files, X_M06_files):
-            X.append([m12, m06])
-    elif NUM == 3:
-        X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
-        X_M12_files, X_M06_files, X_SC_files = (
-            sorted(list(X_M12.glob("**/*.nii.mgz"))),
-            sorted(list(X_M06.glob("**/*.nii.mgz"))),
-            sorted(list(X_SC.glob("**/*.nii.mgz"))),
-        )
-        X = []
-        for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
-            X.append([m12, m06, sc])
+    # elif NUM == 2:
+    #     X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
+    #     X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(list(X_M06.glob("**/*.nii.mgz")))
+    #     X = []
+    #     for m12, m06 in zip(X_M12_files, X_M06_files):
+    #         X.append([m12, m06])
+    # elif NUM == 3:
+    #     X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
+    #     X_M12_files, X_M06_files, X_SC_files = (
+    #         sorted(list(X_M12.glob("**/*.nii.mgz"))),
+    #         sorted(list(X_M06.glob("**/*.nii.mgz"))),
+    #         sorted(list(X_SC.glob("**/*.nii.mgz"))),
+    #     )
+    #     X = []
+    #     for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
+    #         X.append([m12, m06, sc])
 
     # max_x, max_y, max_z = 0, 0, 0
     # loadnifti = LoadNifti()
@@ -73,12 +73,12 @@ if __name__ == "__main__":
     #     print(f"img path: {y_path}, img shape: {img.shape}")
     #     max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
-    for subject in X:
-        for scan in subject:
-            m12 = MGHImage.load(scan).get_fdata()
-            img = crop_to_nonzero(m12)
-            print(f"img path: {subject[0]}, img shape: {img.shape}")
-            max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
+    # for subject in X:
+    #     for scan in subject:
+    #         m12 = MGHImage.load(scan).get_fdata()
+    #         img = crop_to_nonzero(m12)
+    #         print(f"img path: {subject[0]}, img shape: {img.shape}")
+    #         max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
             # m06 = MGHImage.load(subject[1]).get_fdata()
             # img = crop_to_nonzero(m06)
@@ -90,6 +90,6 @@ if __name__ == "__main__":
             # print(f"img path: {subject[2]}, img shape: {img.shape}")
             # max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
-    print(f"max x: {max_x}")
-    print(f"max y: {max_y}")
-    print(f"max z: {max_z}")
+    # print(f"max x: {max_x}")
+    # print(f"max y: {max_y}")
+    # print(f"max z: {max_z}")

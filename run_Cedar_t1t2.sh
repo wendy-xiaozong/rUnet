@@ -41,9 +41,11 @@ TASK=t1t2  # diffusion
 ACTIVATION=LeakyReLU # LeakyReLU ReLU
 NORMALIZATION=Batch # Batch Group InstanceNorm3d
 WEIGHT_DECAY=1e-8
-IN_CHANNELS=2
-X_image=t1
-y_image=t2
+IN_CHANNELS=1
+CLIP_MIN=4
+CLIP_MAX=3
+X_image=t2
+y_image=t1
 LEARNING_RATE=1e-5
 
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_final_result
@@ -51,11 +53,12 @@ LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_final_result
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/2/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --loss="$LOSS" \
-       --use_flair \
+       --clip_min=$CLIP_MIN \
+       --clip_max=$CLIP_MAX \
        --weight_decay=$WEIGHT_DECAY \
        --activation="$ACTIVATION" \
        --normalization="$NORMALIZATION" \
@@ -66,6 +69,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
+#        --use_flair \
 #       --fast_dev_run \
 #       --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
 # tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz
