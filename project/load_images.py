@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 
-plt.rcParams["figure.figsize"] = (8.0, 8.0)  # 设置figure_size尺寸
+plt.rcParams["figure.figsize"] = (8.0, 8.0)
 NUM = 3
 
 if __name__ == "__main__":
