@@ -18,8 +18,9 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class LongitudinalDataset(Dataset, Randomizable):
-    def __init__(self, num_scan_using: int, transform: Compose):
-        self.num_scan_using = num_scan_using
+    def __init__(self, X_path, y_path, transform: Compose):
+        self.X_path = X_path
+        self.y_path = y_path
         self.X_transform = transform
         self.y_transform = get_label_transforms()
 
@@ -76,7 +77,9 @@ class DataModuleLongitudinal(pl.LightningDataModule):
             X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(
                 list(X_M06.glob("**/*.nii.mgz"))
             )
-            X = zip(X_M12_files, X_M06_files)
+            X = []
+            for m12, m06 in zip(X_M12_files, X_M06_files):
+                X.append([m12, m06])
         elif self.num_scan_training == 3:
             X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
             X_M12_files, X_M06_files, X_SC_files = (
@@ -84,7 +87,9 @@ class DataModuleLongitudinal(pl.LightningDataModule):
                 sorted(list(X_M06.glob("**/*.nii.mgz"))),
                 sorted(list(X_SC.glob("**/*.nii.mgz"))),
             )
-            X = zip(X_M12_files, X_M06_files, X_SC_files)
+            X = []
+            for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
+                X.append([m12, m06, sc])
 
         random_state = random.randint(0, 100)
 
@@ -92,12 +97,8 @@ class DataModuleLongitudinal(pl.LightningDataModule):
 
         train_transforms = get_train_img_transforms()
         val_transforms = get_val_img_transforms()
-        self.train_dataset = BraTSDataset(
-            X_path=X_train, y_path=y_train, transform=train_transforms, using_flair=self.using_flair
-        )
-        self.val_dataset = BraTSDataset(
-            X_path=X_val, y_path=y_val, transform=val_transforms, using_flair=self.using_flair
-        )
+        self.train_dataset = LongitudinalDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
+        self.val_dataset = LongitudinalDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")

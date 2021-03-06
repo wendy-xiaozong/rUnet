@@ -27,9 +27,9 @@ def scale_img_to_0_255(img: np.ndarray, imin: Any = None, imax: Any = None) -> n
     return scaled
 
 
-class LitModelLongitudinal(pl.LightningModule):
+class LitModel(pl.LightningModule):
     def __init__(self, hparams: AttributeDict):
-        super(LitModelLongitudinal, self).__init__()
+        super(LitModel, self).__init__()
         self.hparams = hparams
         self.model = UNet(
             in_channels=hparams.in_channels,
