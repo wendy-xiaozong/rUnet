@@ -91,7 +91,7 @@ class LitModel(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1))
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        if self.lightning.current_epoch % 100 == 0 and self.lightning.current_epoch != 0:
+        if self.current_epoch % 100 == 0 and self.current_epoch != 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
