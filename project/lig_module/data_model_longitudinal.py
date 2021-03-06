@@ -18,8 +18,9 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class LongitudinalDataset(Dataset, Randomizable):
-    def __init__(self, num_scan_using: int, transform: Compose):
-        self.num_scan_using = num_scan_using
+    def __init__(self, X_path, y_path, transform: Compose):
+        self.X_path = X_path
+        self.y_path = y_path
         self.X_transform = transform
         self.y_transform = get_label_transforms()
 
@@ -88,7 +89,7 @@ class DataModuleLongitudinal(pl.LightningDataModule):
             )
             X = []
             for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
-                X.append[m12, m06, sc]
+                X.append([m12, m06, sc])
 
         random_state = random.randint(0, 100)
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)
