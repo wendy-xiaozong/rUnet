@@ -95,6 +95,24 @@ def get_preprocess(is_label: bool) -> List:
         ]
 
 
+def get_longitudinal_preprocess(is_label: bool) -> List:
+    # only without cropping, somehow, there is not much left to crop in this dataset...
+    if not is_label:
+        return [
+            NormalizeIntensity(nonzero=True),
+            Unsqueeze(),
+            SpatialPad(spatial_size=[256, 256, 256], method="symmetric", mode="constant"),
+            Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
+        ]
+    else:
+        return [
+            NormalizeIntensity(nonzero=True),
+            Unsqueeze(),
+            SpatialPad(spatial_size=[256, 256, 256], method="symmetric", mode="constant"),
+            Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
+        ]
+
+
 def get_train_img_transforms() -> Compose:
     preprocess = get_preprocess(is_label=False)
     train_augmentation = [ToTensor()]
@@ -107,5 +125,21 @@ def get_val_img_transforms() -> Compose:
 
 
 def get_label_transforms() -> Compose:
+    preprocess = get_preprocess(is_label=True)
+    return Compose(preprocess + [ToTensor()])
+
+
+def get_longitudinal_train_img_transforms() -> Compose:
+    preprocess = get_preprocess(is_label=False)
+    train_augmentation = [ToTensor()]
+    return Compose(preprocess + train_augmentation)
+
+
+def get_longitudinal_val_img_transforms() -> Compose:
+    preprocess = get_preprocess(is_label=False)
+    return Compose(preprocess + [ToTensor()])
+
+
+def get_longitudinal_label_transforms() -> Compose:
     preprocess = get_preprocess(is_label=True)
     return Compose(preprocess + [ToTensor()])

@@ -18,7 +18,8 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class LongitudinalDataset(Dataset, Randomizable):
-    def __init__(self, X_path, y_path, transform: Compose):
+    def __init__(self, X_path: Path, y_path: Path, transform: Compose, num_scan_training: int):
+        self.num_scan_training = num_scan_training
         self.X_path = X_path
         self.y_path = y_path
         self.X_transform = transform
@@ -35,24 +36,15 @@ class LongitudinalDataset(Dataset, Randomizable):
     def __getitem__(self, i):
         self.randomize()
         loadnifti = LoadNifti()
-        X_img, compatible_meta = loadnifti(self.X_path[i])
         y_img, compatible_meta = loadnifti(self.y_path[i])
+
+        
 
         if isinstance(self.X_transform, Randomizable):
             self.X_transform.set_random_state(seed=self._seed)
             self.y_transform.set_random_state(seed=self._seed)
         X_img = apply_transform(self.X_transform, X_img)
         y_img = apply_transform(self.y_transform, y_img)
-
-        if self.using_flair:
-            X_path_str = str(self.X_path[i])
-            if "t1" in X_path_str:
-                X_fair_path = X_path_str.replace("t1", "flair")
-            else:
-                X_fair_path = X_path_str.replace("t2", "flair")
-            X_fair, compatible_meta = loadnifti(Path(X_fair_path))
-            X_fair_img = apply_transform(self.X_transform, X_fair)
-            X_img = torch.cat((X_img, X_fair_img), 0)
 
         return X_img, y_img
 

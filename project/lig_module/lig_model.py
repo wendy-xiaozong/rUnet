@@ -69,18 +69,18 @@ class LitModel(pl.LightningModule):
         ### it should be ###
         loss = self.criterion(logits.view(-1), targets.view(-1))
 
-        if batch_idx == self.train_log_step:
-            log_all_info(
-                module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
-                loss=loss,
-                batch_idx=batch_idx,
-                state="train",
-                input_img_type=self.hparams.X_image,
-                target_img_type=self.hparams.y_image,
-            )
+        # if batch_idx == self.train_log_step:
+        #     log_all_info(
+        #         module=self,
+        #         img=inputs[0],
+        #         target=targets[0],
+        #         preb=logits[0],
+        #         loss=loss,
+        #         batch_idx=batch_idx,
+        #         state="train",
+        #         input_img_type=self.hparams.X_image,
+        #         target_img_type=self.hparams.y_image,
+        #     )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         return {"loss": loss}
 
