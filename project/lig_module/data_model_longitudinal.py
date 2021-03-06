@@ -11,6 +11,7 @@ import pandas as pd
 import pytorch_lightning as pl
 from utils.const import ADNI_LIST
 from monai.transforms import Compose
+from nibabel.freesurfer.mghformat import MGHImage
 from utils.transforms import get_train_img_transforms, get_val_img_transforms, get_label_transforms
 from sklearn.model_selection import train_test_split
 from monai.transforms import LoadNifti, Randomizable, apply_transform
@@ -18,8 +19,7 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class LongitudinalDataset(Dataset, Randomizable):
-    def __init__(self, X_path: Path, y_path: Path, transform: Compose, num_scan_training: int):
-        self.num_scan_training = num_scan_training
+    def __init__(self, X_path: Path, y_path: Path, transform: Compose):
         self.X_path = X_path
         self.y_path = y_path
         self.X_transform = transform
@@ -37,14 +37,18 @@ class LongitudinalDataset(Dataset, Randomizable):
         self.randomize()
         loadnifti = LoadNifti()
         y_img, compatible_meta = loadnifti(self.y_path[i])
-
-        
+        y_img = apply_transform(self.y_transform, y_img)
 
         if isinstance(self.X_transform, Randomizable):
             self.X_transform.set_random_state(seed=self._seed)
             self.y_transform.set_random_state(seed=self._seed)
-        X_img = apply_transform(self.X_transform, X_img)
-        y_img = apply_transform(self.y_transform, y_img)
+
+        X_img = []
+        for scan in self.X_path[i]:
+            img = MGHImage.load(scan).get_fdata()
+            img = apply_transform(self.X_transform, img)
+            X_img.append(img)
+        X_img = torch.cat(X_img, dim=0)
 
         return X_img, y_img
 

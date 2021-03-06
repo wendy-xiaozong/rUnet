@@ -85,7 +85,7 @@ def main(hparams: Namespace) -> None:
         data_module = DataModuleDiffusion(hparams.batch_size)
     elif hparams.task == "longitudinal":
         model = LitModelLongitudinal(hparams)
-        data_module = DataModuleLongitudinal(hparams.batch_size)
+        data_module = DataModuleLongitudinal(hparams.batch_size, num_scan_training=hparams.in_channels)
 
     trainer.fit(model, data_module)
     # ckpt_path = Path(__file__).resolve().parent / "checkpoint" / hparams.checkpoint_file
@@ -120,7 +120,7 @@ if __name__ == "__main__":  # pragma: no cover
         help="using this mode to fine tune, only use 300 images here",
     )
     parser.add_argument("--use_flair", action="store_true")
-    parser.add_argument("--in_channels", type=int, default=2)
+    parser.add_argument("--in_channels", type=int, default=3)
     parser.add_argument("--X_image", type=str, choices=["t1", "t2"], default="t1")
     parser.add_argument("--y_image", type=str, choices=["t1", "t2"], default="t2")
     parser.add_argument("--task", type=str, choices=["t1t2", "diffusion", "longitudinal"], default="longitudinal")

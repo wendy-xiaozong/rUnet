@@ -74,28 +74,60 @@ class BrainSlices:
         self.input_img_type = input_img_type
         self.target_img_type = target_img_type
 
-        if len(self.input_img.shape) == 3:
-            si, sj, sk = self.input_img.shape
-            i = si // 2
-            j = sj // 2
-            k = sk // 2
-            self.slices = [
-                self.get_slice(self.input_img, i, j, k),
-                self.get_slice(self.target_img, i, j, k),
-                self.get_slice(self.predict_img, i, j, k),
-            ]
-        else:
-            si, sj, sk = self.input_img.shape[1:]
-            i = si // 2
-            j = sj // 2
-            k = sk // 2
-            self.slices = [
-                self.get_slice(self.input_img[0], i, j, k),
-                self.get_slice(self.input_img[1], i, j, k),
-                self.get_slice(self.target_img, i, j, k),
-                self.get_slice(self.predict_img, i, j, k),
-            ]
-
+        if self.lightning.hparams.task == "t1t2":
+            if len(self.input_img.shape) == 3:
+                si, sj, sk = self.input_img.shape
+                i = si // 2
+                j = sj // 2
+                k = sk // 2
+                self.slices = [
+                    self.get_slice(self.input_img, i, j, k),
+                    self.get_slice(self.target_img, i, j, k),
+                    self.get_slice(self.predict_img, i, j, k),
+                ]
+            else:
+                si, sj, sk = self.input_img.shape[1:]
+                i = si // 2
+                j = sj // 2
+                k = sk // 2
+                self.slices = [
+                    self.get_slice(self.input_img[0], i, j, k),
+                    self.get_slice(self.input_img[1], i, j, k),
+                    self.get_slice(self.target_img, i, j, k),
+                    self.get_slice(self.predict_img, i, j, k),
+                ]
+        elif self.lightning.hparams.task == "longitudinal":
+            if len(self.input_img.shape) == 3:
+                si, sj, sk = self.input_img.shape
+                i = si // 2
+                j = sj // 2
+                k = sk // 2
+                self.slices = [
+                    self.get_slice(self.input_img, i, j, k),
+                    self.get_slice(self.target_img, i, j, k),
+                    self.get_slice(self.predict_img, i, j, k),
+                ]
+            else:
+                si, sj, sk = self.input_img.shape[1:]
+                i = si // 2
+                j = sj // 2
+                k = sk // 2
+                if self.input_img.shape[0] == 2:
+                    self.slices = [
+                        self.get_slice(self.input_img[0], i, j, k),
+                        self.get_slice(self.input_img[1], i, j, k),
+                        self.get_slice(self.target_img, i, j, k),
+                        self.get_slice(self.predict_img, i, j, k),
+                    ]
+                elif self.input_img.shape[0] == 3:
+                    self.slices = [
+                        self.get_slice(self.input_img[0], i, j, k),
+                        self.get_slice(self.input_img[1], i, j, k),
+                        self.get_slice(self.input_img[2], i, j, k),
+                        self.get_slice(self.target_img, i, j, k),
+                        self.get_slice(self.predict_img, i, j, k),
+                    ]
+        self.title = ["input image: M12", "input image: M06", "input image: SC", "target image: M24", "predict image"]
         self.shape = np.array(self.input_img.shape)
 
     def get_slice(self, input: np.ndarray, i: int, j: int, k: int):
@@ -120,22 +152,33 @@ class BrainSlices:
             axes = ax1, ax2, ax3
             self.plot_row(self.slices[i], axes)
             for axis in axes:
-                if i == 0:
-                    axis.set_title(f"input image: {self.input_img_type}")
-                    continue
-                if len(self.slices) == 4:
-                    if i == 1:
-                        axis.set_title(f"input image: flair")
+                if self.lightning.hparams.task == "t1t2":
+                    if i == 0:
+                        axis.set_title(f"input image: {self.input_img_type}")
+                        continue
+                    if len(self.slices) == 4:
+                        if i == 1:
+                            axis.set_title(f"input image: flair")
+                        elif i == 2:
+                            axis.set_title(f"target image: {self.target_img_type}")
+                        else:
+                            axis.set_title(f"predict image")
+                    else:
+                        if i == 1:
+                            axis.set_title(f"target image: {self.target_img_type}")
+                        else:
+                            axis.set_title(f"predict image")
+                elif self.lightning.hparams.task == "longitudinal":
+                    if i == 0:
+                        axis.set_title(self.title[0])
+                    elif i == (len(self.slices) - 1):
+                        axis.set_title(self.title[-1])
+                    elif i == (len(self.slices) - 2):
+                        axis.set_title(self.title[-2])
+                    elif i == 1:
+                        axis.set_title(self.title[1])
                     elif i == 2:
-                        axis.set_title(f"target image: {self.target_img_type}")
-                    else:
-                        axis.set_title(f"predict image")
-                else:
-                    if i == 1:
-                        axis.set_title(f"target image: {self.target_img_type}")
-                    else:
-                        axis.set_title(f"predict image")
-
+                        axis.set_title(self.title[2])
         plt.tight_layout()
         return fig
 
@@ -293,5 +336,5 @@ def log_all_info(
     brainSlice = BrainSlices(module, img, target, preb, input_img_type=input_img_type, target_img_type=target_img_type)
     fig = brainSlice.plot()
 
-    # fig.savefig("/home/jueqi/projects/def-jlevman/jueqi/rUnet/1/test.png")
-    brainSlice.log(state, fig, loss, batch_idx)
+    fig.savefig("test.png")
+    # brainSlice.log(state, fig, loss, batch_idx)

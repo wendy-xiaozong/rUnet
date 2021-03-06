@@ -63,24 +63,25 @@ class LitModelLongitudinal(pl.LightningModule):
 
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
+
         logits = self(inputs)
         ### before ###
         # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         ### it should be ###
         loss = self.criterion(logits.view(-1), targets.view(-1))
 
-        if batch_idx == self.train_log_step:
-            log_all_info(
-                module=self,
-                img=inputs[0],
-                target=targets[0],
-                preb=logits[0],
-                loss=loss,
-                batch_idx=batch_idx,
-                state="train",
-                input_img_type=self.hparams.X_image,
-                target_img_type=self.hparams.y_image,
-            )
+        # if self.current_epoch % 100 == 0 and self.current_epoch != 0:
+        log_all_info(
+            module=self,
+            img=inputs[0],
+            target=targets[0],
+            preb=targets[0],
+            loss=0.0,
+            batch_idx=batch_idx,
+            state="train",
+            input_img_type=self.hparams.X_image,
+            target_img_type=self.hparams.y_image,
+        )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         return {"loss": loss}
 
