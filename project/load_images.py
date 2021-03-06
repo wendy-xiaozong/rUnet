@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from utils.cropping import crop_to_nonzero
 
 plt.rcParams["figure.figsize"] = (8.0, 8.0)
-NUM = 3
+NUM = 1
 
 if __name__ == "__main__":
     # X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
@@ -41,34 +41,38 @@ if __name__ == "__main__":
     # print(f"dst mean:{np.mean(dst)}, 50%: {np.percentile(dst, 50)}, 40%: {np.percentile(dst, 40)}")
     # print("Great!")
 
-    # y_list_all = set(list(ADNI_LIST[0].glob("**/*.nii.gz")))
-    # y_list_mask = set(list(ADNI_LIST[0].glob("**/*_mask.nii.gz")))
-    # y = sorted(list(y_list_all - y_list_mask))
+    y_list_all = set(list(ADNI_LIST[0].glob("**/*.nii.gz")))
+    y_list_mask = set(list(ADNI_LIST[0].glob("**/*_mask.nii.gz")))
+    y = sorted(list(y_list_all - y_list_mask))
 
     if NUM == 1:
         X_M12 = ADNI_LIST[1]
         X = sorted(list(X_M12.glob("**/*.nii.mgz")))
-    # elif NUM == 2:
-    #     X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
-    #     X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(list(X_M06.glob("**/*.nii.mgz")))
-    #     X = []
-    #     for m12, m06 in zip(X_M12_files, X_M06_files):
-    #         X.append([m12, m06])
-    # elif NUM == 3:
-    #     X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
-    #     X_M12_files, X_M06_files, X_SC_files = (
-    #         sorted(list(X_M12.glob("**/*.nii.mgz"))),
-    #         sorted(list(X_M06.glob("**/*.nii.mgz"))),
-    #         sorted(list(X_SC.glob("**/*.nii.mgz"))),
-    #     )
-    #     X = []
-    #     for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
-    #         X.append([m12, m06, sc])
+    elif NUM == 2:
+        X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
+        X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(list(X_M06.glob("**/*.nii.mgz")))
+        X = []
+        for m12, m06 in zip(X_M12_files, X_M06_files):
+            X.append([m12, m06])
+    elif NUM == 3:
+        X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
+        X_M12_files, X_M06_files, X_SC_files = (
+            sorted(list(X_M12.glob("**/*.nii.mgz"))),
+            sorted(list(X_M06.glob("**/*.nii.mgz"))),
+            sorted(list(X_SC.glob("**/*.nii.mgz"))),
+        )
+        X = []
+        for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
+            X.append([m12, m06, sc])
 
     # max_x, max_y, max_z = 0, 0, 0
-    # loadnifti = LoadNifti()
+    loadnifti = LoadNifti()
     # for y_path in y:
-    #     img, compatible_meta = loadnifti(y_path)
+    img, compatible_meta = loadnifti(y[0])
+    m12 = MGHImage.load(X[0]).get_fdata()
+
+    print(f"target shape: {img.shape}")
+    print(f"x shape: {m12.shape}")
     #     img = crop_to_nonzero(img)
     #     print(f"img path: {y_path}, img shape: {img.shape}")
     #     max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
@@ -80,15 +84,15 @@ if __name__ == "__main__":
     #         print(f"img path: {subject[0]}, img shape: {img.shape}")
     #         max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
-            # m06 = MGHImage.load(subject[1]).get_fdata()
-            # img = crop_to_nonzero(m06)
-            # print(f"img path: {subject[1]}, img shape: {img.shape}")
-            # max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
+    # m06 = MGHImage.load(subject[1]).get_fdata()
+    # img = crop_to_nonzero(m06)
+    # print(f"img path: {subject[1]}, img shape: {img.shape}")
+    # max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
-            # sc = MGHImage.load(subject[2]).get_fdata()
-            # img = crop_to_nonzero(sc)
-            # print(f"img path: {subject[2]}, img shape: {img.shape}")
-            # max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
+    # sc = MGHImage.load(subject[2]).get_fdata()
+    # img = crop_to_nonzero(sc)
+    # print(f"img path: {subject[2]}, img shape: {img.shape}")
+    # max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
     # print(f"max x: {max_x}")
     # print(f"max y: {max_y}")

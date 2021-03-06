@@ -143,7 +143,10 @@ class BrainSlices:
     def plot(self) -> Figure:
         nrows, ncols = len(self.slices), 3  # one row for each slice position
 
-        fig = plt.figure(figsize=(12, 6))
+        if nrows == 5:
+            fig = plt.figure(figsize=(14, 10))
+        else:
+            fig = plt.figure(figsize=(12, 6))
         gs = gridspec.GridSpec(nrows, ncols)
         for i in range(0, nrows):
             ax1 = plt.subplot(gs[i * 3])

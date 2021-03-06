@@ -128,16 +128,16 @@ def get_label_transforms() -> Compose:
 
 
 def get_longitudinal_train_img_transforms() -> Compose:
-    preprocess = get_preprocess(is_label=False)
+    preprocess = get_longitudinal_preprocess(is_label=False)
     train_augmentation = [ToTensor()]
     return Compose(preprocess + train_augmentation)
 
 
 def get_longitudinal_val_img_transforms() -> Compose:
-    preprocess = get_preprocess(is_label=False)
+    preprocess = get_longitudinal_preprocess(is_label=False)
     return Compose(preprocess + [ToTensor()])
 
 
 def get_longitudinal_label_transforms() -> Compose:
-    preprocess = get_preprocess(is_label=True)
+    preprocess = get_longitudinal_preprocess(is_label=True)
     return Compose(preprocess + [ToTensor()])

@@ -12,7 +12,11 @@ import pytorch_lightning as pl
 from utils.const import ADNI_LIST
 from monai.transforms import Compose
 from nibabel.freesurfer.mghformat import MGHImage
-from utils.transforms import get_train_img_transforms, get_val_img_transforms, get_label_transforms
+from utils.transforms import (
+    get_longitudinal_train_img_transforms,
+    get_longitudinal_val_img_transforms,
+    get_longitudinal_label_transforms,
+)
 from sklearn.model_selection import train_test_split
 from monai.transforms import LoadNifti, Randomizable, apply_transform
 from torch.utils.data import DataLoader, Dataset
@@ -23,7 +27,7 @@ class LongitudinalDataset(Dataset, Randomizable):
         self.X_path = X_path
         self.y_path = y_path
         self.X_transform = transform
-        self.y_transform = get_label_transforms()
+        self.y_transform = get_longitudinal_label_transforms()
 
     def __len__(self):
         return int(len(self.X_path))
@@ -90,8 +94,8 @@ class DataModuleLongitudinal(pl.LightningDataModule):
         random_state = random.randint(0, 100)
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=random_state)
 
-        train_transforms = get_train_img_transforms()
-        val_transforms = get_val_img_transforms()
+        train_transforms = get_longitudinal_train_img_transforms()
+        val_transforms = get_longitudinal_val_img_transforms()
         self.train_dataset = LongitudinalDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
         self.val_dataset = LongitudinalDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
 

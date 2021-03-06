@@ -64,11 +64,11 @@ class LitModelLongitudinal(pl.LightningModule):
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
 
-        logits = self(inputs)
+        # logits = self(inputs)
         ### before ###
         # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
         ### it should be ###
-        loss = self.criterion(logits.view(-1), targets.view(-1))
+        # loss = self.criterion(logits.view(-1), targets.view(-1))
 
         # if self.current_epoch % 100 == 0 and self.current_epoch != 0:
         log_all_info(
