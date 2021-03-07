@@ -23,7 +23,7 @@ from pytorch_lightning.callbacks import (
 def main(hparams: Namespace) -> None:
     # Function that sets seed for pseudo-random number generators in: pytorch, numpy,
     # python.random and sets PYTHONHASHSEED environment variable.
-    pl.seed_everything(42)
+    # pl.seed_everything(42)
 
     if COMPUTECANADA:
         cur_path = Path(__file__).resolve().parent

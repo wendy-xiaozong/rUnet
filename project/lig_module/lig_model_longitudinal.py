@@ -70,7 +70,7 @@ class LitModelLongitudinal(pl.LightningModule):
         ### it should be ###
         loss = self.criterion(logits.view(-1), targets.view(-1))
 
-        if self.current_epoch % 50 == 0:
+        if self.current_epoch % 50 == 0 and batch_idx % 5 == 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
@@ -92,7 +92,7 @@ class LitModelLongitudinal(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1))
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        if self.current_epoch % 50 == 0:
+        if self.current_epoch % 50 == 0 and batch_idx % 5 == 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
@@ -130,8 +130,8 @@ class LitModelLongitudinal(pl.LightningModule):
         return {"MAE": mae, "MAE_mask": mae_mask}
 
     def validation_epoch_end(self, validation_step_outputs):
-        self.train_log_step = random.randint(1, 500)
-        self.val_log_step = random.randint(1, 100)
+        # self.train_log_step = random.randint(1, 500)
+        # self.val_log_step = random.randint(1, 100)
 
         average = np.mean(validation_step_outputs[0]["MAE"])
         self.log("val_MAE", average, sync_dist=True, on_step=False, on_epoch=True)
