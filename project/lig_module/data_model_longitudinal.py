@@ -59,8 +59,7 @@ class LongitudinalDataset(Dataset, Randomizable):
         else:
             img = MGHImage.load(self.X_path[i]).get_fdata()
             img[img < np.percentile(img, 85)] = 0.0
-            img = apply_transform(self.X_transform, img)
-            X_img.append(img)
+            X_img = apply_transform(self.X_transform, img)
 
         return X_img, y_img
 

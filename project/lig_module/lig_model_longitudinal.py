@@ -109,9 +109,9 @@ class LitModelLongitudinal(pl.LightningModule):
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
-        if self.hparams.use_flair:
+        if self.hparams.in_channels >= 2:
             brain_mask = inputs[0] == inputs[0][0][0][0]
-        else:
+        elif self.hparams.in_channels == 1:
             brain_mask = inputs == inputs[0][0][0]
 
         pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
