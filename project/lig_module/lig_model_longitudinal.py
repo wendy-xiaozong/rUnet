@@ -70,7 +70,7 @@ class LitModelLongitudinal(pl.LightningModule):
         ### it should be ###
         loss = self.criterion(logits.view(-1), targets.view(-1))
 
-        if self.current_epoch % 10 == 0 and batch_idx % 2 == 0:
+        if self.current_epoch % 25 == 0 and batch_idx % 2 == 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
@@ -92,7 +92,7 @@ class LitModelLongitudinal(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1))
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        if self.current_epoch % 10 == 0 and batch_idx % 2 == 0:
+        if self.current_epoch % 25 == 0 and batch_idx % 2 == 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
