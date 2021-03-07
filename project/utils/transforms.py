@@ -99,14 +99,14 @@ def get_longitudinal_preprocess(is_label: bool) -> List:
         return [
             NormalizeIntensity(nonzero=True),
             Unsqueeze(),
-            SpatialPad(spatial_size=[256, 256, 256], method="symmetric", mode="constant"),
+            SpatialPad(spatial_size=[215, 215, 215], method="symmetric", mode="constant"),
             Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
         ]
     else:
         return [
             NormalizeIntensity(nonzero=True),
             Unsqueeze(),
-            SpatialPad(spatial_size=[256, 256, 256], method="symmetric", mode="constant"),
+            SpatialPad(spatial_size=[215, 215, 215], method="symmetric", mode="constant"),
             Resize((IMAGESIZE, IMAGESIZE, IMAGESIZE)),
         ]
 

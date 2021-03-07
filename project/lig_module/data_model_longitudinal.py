@@ -23,9 +23,10 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class LongitudinalDataset(Dataset, Randomizable):
-    def __init__(self, X_path: Path, y_path: Path, transform: Compose):
+    def __init__(self, X_path: Path, y_path: Path, transform: Compose, num_scan_training: int):
         self.X_path = X_path
         self.y_path = y_path
+        self.num_scan_training = num_scan_training
         self.X_transform = transform
         self.y_transform = get_longitudinal_label_transforms()
 
@@ -48,11 +49,18 @@ class LongitudinalDataset(Dataset, Randomizable):
             self.y_transform.set_random_state(seed=self._seed)
 
         X_img = []
-        for scan in self.X_path[i]:
-            img = MGHImage.load(scan).get_fdata()
+        if self.num_scan_training > 1:
+            for scan in self.X_path[i]:
+                img = MGHImage.load(scan).get_fdata()
+                img[img < np.percentile(img, 85)] = 0.0
+                img = apply_transform(self.X_transform, img)
+                X_img.append(img)
+            X_img = torch.cat(X_img, dim=0)
+        else:
+            img = MGHImage.load(self.X_path[i]).get_fdata()
+            img[img < np.percentile(img, 85)] = 0.0
             img = apply_transform(self.X_transform, img)
             X_img.append(img)
-        X_img = torch.cat(X_img, dim=0)
 
         return X_img, y_img
 
@@ -96,8 +104,12 @@ class DataModuleLongitudinal(pl.LightningDataModule):
 
         train_transforms = get_longitudinal_train_img_transforms()
         val_transforms = get_longitudinal_val_img_transforms()
-        self.train_dataset = LongitudinalDataset(X_path=X_train, y_path=y_train, transform=train_transforms)
-        self.val_dataset = LongitudinalDataset(X_path=X_val, y_path=y_val, transform=val_transforms)
+        self.train_dataset = LongitudinalDataset(
+            X_path=X_train, y_path=y_train, transform=train_transforms, num_scan_training=self.num_scan_training
+        )
+        self.val_dataset = LongitudinalDataset(
+            X_path=X_val, y_path=y_val, transform=val_transforms, num_scan_training=self.num_scan_training
+        )
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")

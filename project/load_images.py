@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from utils.cropping import crop_to_nonzero
 
 plt.rcParams["figure.figsize"] = (8.0, 8.0)
-NUM = 1
+NUM = 3
 
 if __name__ == "__main__":
     # X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
@@ -68,20 +68,29 @@ if __name__ == "__main__":
     # max_x, max_y, max_z = 0, 0, 0
     loadnifti = LoadNifti()
     # for y_path in y:
-    img, compatible_meta = loadnifti(y[0])
-    m12 = MGHImage.load(X[0]).get_fdata()
 
-    print(f"target shape: {img.shape}")
-    print(f"x shape: {m12.shape}")
-    #     img = crop_to_nonzero(img)
-    #     print(f"img path: {y_path}, img shape: {img.shape}")
-    #     max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
+    # m12 = MGHImage.load(X[0]).get_fdata()
+
+    # print(f"target shape: {img.shape}")
+    # for p in range(0, 100, 5):
+    #     print(f"m12 {p}%: {np.percentile(m12, p)}")
+
+    fig, axes = plt.subplots(nrows=5, ncols=1)
+    for i, y_path in enumerate(y[:5]):
+        img, compatible_meta = loadnifti(y_path)
+        X_transform = get_train_img_transforms()
+        t1 = apply_transform(X_transform, img)
+        t1 = t1[t1 != 0.0]
+        sns.distplot(t1, kde=True, ax=axes[i])
+
+    fig.savefig("dist.png")
 
     # for subject in X:
     #     for scan in subject:
-    #         m12 = MGHImage.load(scan).get_fdata()
-    #         img = crop_to_nonzero(m12)
-    #         print(f"img path: {subject[0]}, img shape: {img.shape}")
+    #         img = MGHImage.load(scan).get_fdata()
+    #         img[img < np.percentile(img, 85)] = 0.0
+    #         img = crop_to_nonzero(img)
+    #         print(f"img shape: {img.shape}")
     #         max_x, max_y, max_z = max(max_x, img.shape[0]), max(max_y, img.shape[1]), max(max_z, img.shape[2])
 
     # m06 = MGHImage.load(subject[1]).get_fdata()
