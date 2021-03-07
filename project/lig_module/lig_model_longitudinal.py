@@ -55,8 +55,8 @@ class LitModelLongitudinal(pl.LightningModule):
             self.criterion = SmoothL1Loss()
         self.train_log_step = random.randint(1, 500)
         self.val_log_step = random.randint(1, 100)
-        self.clip_min = 2
-        self.clip_max = 5
+        self.clip_min = self.hparams.clip_min
+        self.clip_max = self.hparams.clip_max
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -70,13 +70,13 @@ class LitModelLongitudinal(pl.LightningModule):
         ### it should be ###
         loss = self.criterion(logits.view(-1), targets.view(-1))
 
-        if self.current_epoch % 100 == 0 and self.current_epoch != 0 and batch_idx == 0:
+        if self.current_epoch % 50 == 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
                 target=targets[0],
                 preb=targets[0],
-                loss=0.0,
+                loss=loss,
                 batch_idx=batch_idx,
                 state="train",
                 input_img_type=self.hparams.X_image,
@@ -92,7 +92,7 @@ class LitModelLongitudinal(pl.LightningModule):
         loss = self.criterion(logits.view(-1), targets.view(-1))
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
-        if self.current_epoch % 100 == 0 and self.current_epoch != 0 and batch_idx == 0:
+        if self.current_epoch % 50 == 0:
             log_all_info(
                 module=self,
                 img=inputs[0],
@@ -206,6 +206,8 @@ class LitModelLongitudinal(pl.LightningModule):
             "--normalization", type=str, choices=["Batch", "Group", "InstanceNorm3d"], default="InstanceNorm3d"
         )
         parser.add_argument("--weight_decay", type=float, default=1e-6)
+        parser.add_argument("--clip_min", type=int, default=2)
+        parser.add_argument("--clip_max", type=int, default=5)
         # parser.add_argument("--down_sample", type=str, default="max", help="the way to down sample")
         # parser.add_argument("--out_channels_first_layer", type=int, default=32, help="the first layer's out channels")
         # parser.add_argument("--deepth", type=int, default=4, help="the deepth of the unet")
