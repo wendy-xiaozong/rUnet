@@ -66,19 +66,21 @@ if __name__ == "__main__":
             X.append([m12, m06, sc])
 
     # max_x, max_y, max_z = 0, 0, 0
-    # loadnifti = LoadNifti()
+    loadnifti = LoadNifti()
     # for y_path in y:
-    for x in X[:5]:
-        m12 = MGHImage.load(x).get_fdata()
+    # for x in X[:5]:
+    #     m12 = MGHImage.load(x).get_fdata()
 
-        # print(f"target shape: {img.shape}")
-        for p in range(80, 90, 1):
-            print(f"m12 {p}%: {np.percentile(m12, p)}")
+    #     # print(f"target shape: {img.shape}")
+    #     for p in range(80, 90, 1):
+    #         print(f"m12 {p}%: {np.percentile(m12, p)}")
 
     # fig, axes = plt.subplots(nrows=5, ncols=1)
-    # for i, y_path in enumerate(y[:5]):
-    #     img, compatible_meta = loadnifti(y_path)
-    #     X_transform = get_train_img_transforms()
+    for i, y_path in enumerate(y[:5]):
+        img, compatible_meta = loadnifti(y_path)
+        mask = img != 0.0
+        print(f"min : {np.min(img[mask])}")
+        # X_transform = get_train_img_transforms()
     #     t1 = apply_transform(X_transform, img)
     #     t1 = t1[t1 != 0.0]
     #     sns.distplot(t1, kde=True, ax=axes[i])
