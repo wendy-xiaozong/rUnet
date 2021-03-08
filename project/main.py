@@ -28,7 +28,7 @@ def main(hparams: Namespace) -> None:
     if COMPUTECANADA:
         cur_path = Path(__file__).resolve().parent
         default_root_dir = cur_path
-        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_MAE_mask:0.5f}-{val_MAE:0.5f}"
+        checkpoint_file = Path(__file__).resolve().parent / "checkpoint/{epoch}-{val_loss:0.5f}-{val_MAE:0.5f}"
         if not os.path.exists(Path(__file__).resolve().parent / "checkpoint"):
             os.mkdir(Path(__file__).resolve().parent / "checkpoint")
     else:
@@ -38,13 +38,13 @@ def main(hparams: Namespace) -> None:
         checkpoint_file = Path("./log/checkpoint")
         if not os.path.exists(checkpoint_file):
             os.mkdir(checkpoint_file)
-        checkpoint_file = checkpoint_file / "{epoch}-{val_MAE_mask:0.5f}-{val_MAE:0.5f}"
+        checkpoint_file = checkpoint_file / "{epoch}-{val_loss:0.5f}-{val_MAE:0.5f}"
 
     # After training finishes, use best_model_path to retrieve the path to the best
     # checkpoint file and best_model_score to retrieve its score.
     checkpoint_callback = ModelCheckpoint(
         filepath=str(checkpoint_file),
-        monitor="val_MAE_mask",
+        monitor="val_loss",
         save_top_k=1,
         verbose=True,
         mode="min",
