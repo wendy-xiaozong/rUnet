@@ -52,13 +52,13 @@ class LongitudinalDataset(Dataset, Randomizable):
         if self.num_scan_training > 1:
             for scan in self.X_path[i]:
                 img = MGHImage.load(scan).get_fdata()
-                img[img < np.percentile(img, 85)] = 0.0
+                img[img < 1] = 0.0
                 img = apply_transform(self.X_transform, img)
                 X_img.append(img)
             X_img = torch.cat(X_img, dim=0)
         else:
             img = MGHImage.load(self.X_path[i]).get_fdata()
-            img[img < np.percentile(img, 85)] = 0.0
+            img[img < 1] = 0.0
             X_img = apply_transform(self.X_transform, img)
 
         return X_img, y_img
