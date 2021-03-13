@@ -44,13 +44,7 @@ class DataModuleDiffusion(pl.LightningDataModule):
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
         X = sorted(list(DATA_ROOT.glob("**/*.npz")))
-
-        # train_transforms = get_train_img_transforms()
-        # val_transforms = get_val_img_transforms()
         preprocess = get_diffusion_preprocess()
-
-        # self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
-        # self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
 
         self.train_dataset = DiffusionDataset(path=X[:-1] * 200, X_transform=preprocess)
         self.val_dataset = DiffusionDataset(path=X[-1] * 4, X_transform=preprocess)  # *4 in order to allocate on 4 GPUs

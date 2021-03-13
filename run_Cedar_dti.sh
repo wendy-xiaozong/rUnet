@@ -46,7 +46,7 @@ LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_log
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/4/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
        --gpus=$GPUS \
        --fast_dev_run \
        --in_channels=$IN_CHANNELS \
