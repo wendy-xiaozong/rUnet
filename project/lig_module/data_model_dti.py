@@ -1,5 +1,6 @@
 import functools
 import os
+from project.utils.const import DATA_ROOT
 import torch
 from pathlib import Path
 
@@ -42,7 +43,7 @@ class DataModuleDiffusion(pl.LightningDataModule):
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
-        X = sorted(list(DIFFUSION_INPUT.glob("**/*.npz")))
+        X = sorted(list(DATA_ROOT.glob("**/*.npz")))
 
         # train_transforms = get_train_img_transforms()
         # val_transforms = get_val_img_transforms()
@@ -52,7 +53,7 @@ class DataModuleDiffusion(pl.LightningDataModule):
         # self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
 
         self.train_dataset = DiffusionDataset(path=X[:-1] * 200, X_transform=preprocess)
-        self.val_dataset = DiffusionDataset(path=X[-1], X_transform=preprocess)
+        self.val_dataset = DiffusionDataset(path=X[-1] * 4, X_transform=preprocess)  # *4 in order to allocate on 4 GPUs
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")

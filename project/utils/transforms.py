@@ -43,7 +43,7 @@ class Transpose(Transform):
         pass
 
     def __call__(self, img: np.ndarray) -> np.ndarray:
-        return np.transpose(img, (1, 2, 3, 0))
+        return np.transpose(img, (3, 0, 1, 2))
 
 
 # class Resize3D(Transform):

@@ -50,7 +50,7 @@ class LitModelDiffusion(pl.LightningModule):
         logits = self(inputs)
         targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        if batch_idx == self.train_log_step:
+        if self.current_epoch % 25 == 0 and batch_idx == 0:
             log_all_info(
                 module=self,
                 target=targets[0],
@@ -68,7 +68,7 @@ class LitModelDiffusion(pl.LightningModule):
         logits = self(inputs)
         targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        if batch_idx == self.train_log_step:
+        if self.current_epoch % 25 == 0 and batch_idx == 0:
             log_all_info(
                 module=self,
                 target=targets[0],

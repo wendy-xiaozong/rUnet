@@ -104,7 +104,6 @@ class LitModelLongitudinal(pl.LightningModule):
                 input_img_type=self.hparams.X_image,
                 target_img_type=self.hparams.y_image,
             )
-
         inputs = inputs.cpu().detach().numpy().squeeze()
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
@@ -130,9 +129,6 @@ class LitModelLongitudinal(pl.LightningModule):
         return {"MAE": mae, "MAE_mask": mae_mask}
 
     def validation_epoch_end(self, validation_step_outputs):
-        # self.train_log_step = random.randint(1, 500)
-        # self.val_log_step = random.randint(1, 100)
-
         average = np.mean(validation_step_outputs[0]["MAE"])
         self.log("val_MAE", average, sync_dist=True, on_step=False, on_epoch=True)
 

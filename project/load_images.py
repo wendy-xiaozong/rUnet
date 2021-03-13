@@ -29,7 +29,6 @@ if __name__ == "__main__":
         y_img = apply_transform(Y_transform, y_img).numpy()
         print(f"processed No. {idx} image.")
         np.savez(f"{idx}.npz", X=x_img, y=y_img)
-        break
 
     # X_img, compatible_meta = loadnifti("/home/jq/Desktop/rUnet/data/ADNI/v1to2.mgz")
     # print(f"X shape: {X_img.shape}")
