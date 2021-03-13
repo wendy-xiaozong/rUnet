@@ -35,6 +35,7 @@ tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/ADNI_longitudinal_AD/longitu
 
 cd work
 
+
 GPUS=4
 BATCH_SIZE=3
 LOSS=l2  # l1 l2 smoothl1
@@ -51,10 +52,10 @@ LEARNING_RATE=1e-5
 
 LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_final_result
 
-# run script
+run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/5/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --loss="$LOSS" \
@@ -70,7 +71,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
-#        --use_flair \
-#       --fast_dev_run \
-#       --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
+       --use_flair \
+      --fast_dev_run \
+      --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
 # tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz

@@ -7,17 +7,31 @@ from utils.transforms import get_train_img_transforms, get_val_img_transforms, g
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from utils.transforms import get_diffusion_preprocess, get_diffusion_label_preprocess
 from sklearn.model_selection import train_test_split
 from utils.cropping import crop_to_nonzero
 
-plt.rcParams["figure.figsize"] = (8.0, 8.0)
-NUM = 1
+# plt.rcParams["figure.figsize"] = (8.0, 8.0)
+# NUM = 1
 
 if __name__ == "__main__":
-    # X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
-    # y = sorted(list(DIFFUSION_LABEL.glob("**/*.nii")))
+    X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
+    y = sorted(list(DIFFUSION_LABEL.glob("**/*.nii")))
 
-    # loadnifti = LoadNifti()
+    loadnifti = LoadNifti()
+    X_transform = get_diffusion_preprocess()
+    Y_transform = get_diffusion_label_preprocess()
+    for idx, (x_path, y_path) in enumerate(zip(X, y)):
+        x_img, compatible_meta = loadnifti(x_path)
+        x_img = apply_transform(X_transform, x_img)
+        print(f"x_img taken memory size: {x_img.nbytes / 1024 ** 2} GB")
+        print(f"x_img shape: {x_img.shape}")
+
+        y_img, compatible_meta = loadnifti(y_path)
+        y_img = apply_transform(Y_transform, y_img)
+        print(f"processed No. {idx} image.")
+        np.savez(f"{idx}.npz", X=x_img, y=y_img)
+
     # X_img, compatible_meta = loadnifti("/home/jq/Desktop/rUnet/data/ADNI/v1to2.mgz")
     # print(f"X shape: {X_img.shape}")
     # preprocess = get_diffusion_preprocess()
@@ -41,32 +55,32 @@ if __name__ == "__main__":
     # print(f"dst mean:{np.mean(dst)}, 50%: {np.percentile(dst, 50)}, 40%: {np.percentile(dst, 40)}")
     # print("Great!")
 
-    y_list_all = set(list(ADNI_LIST[0].glob("**/*.nii.gz")))
-    y_list_mask = set(list(ADNI_LIST[0].glob("**/*_mask.nii.gz")))
-    y = sorted(list(y_list_all - y_list_mask))
+    # y_list_all = set(list(ADNI_LIST[0].glob("**/*.nii.gz")))
+    # y_list_mask = set(list(ADNI_LIST[0].glob("**/*_mask.nii.gz")))
+    # y = sorted(list(y_list_all - y_list_mask))
 
-    if NUM == 1:
-        X_M12 = ADNI_LIST[1]
-        X = sorted(list(X_M12.glob("**/*.nii.mgz")))
-    elif NUM == 2:
-        X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
-        X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(list(X_M06.glob("**/*.nii.mgz")))
-        X = []
-        for m12, m06 in zip(X_M12_files, X_M06_files):
-            X.append([m12, m06])
-    elif NUM == 3:
-        X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
-        X_M12_files, X_M06_files, X_SC_files = (
-            sorted(list(X_M12.glob("**/*.nii.mgz"))),
-            sorted(list(X_M06.glob("**/*.nii.mgz"))),
-            sorted(list(X_SC.glob("**/*.nii.mgz"))),
-        )
-        X = []
-        for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
-            X.append([m12, m06, sc])
+    # if NUM == 1:
+    #     X_M12 = ADNI_LIST[1]
+    #     X = sorted(list(X_M12.glob("**/*.nii.mgz")))
+    # elif NUM == 2:
+    #     X_M12, X_M06 = ADNI_LIST[1], ADNI_LIST[2]
+    #     X_M12_files, X_M06_files = sorted(list(X_M12.glob("**/*.nii.mgz"))), sorted(list(X_M06.glob("**/*.nii.mgz")))
+    #     X = []
+    #     for m12, m06 in zip(X_M12_files, X_M06_files):
+    #         X.append([m12, m06])
+    # elif NUM == 3:
+    #     X_M12, X_M06, X_SC = ADNI_LIST[1], ADNI_LIST[2], ADNI_LIST[3]
+    #     X_M12_files, X_M06_files, X_SC_files = (
+    #         sorted(list(X_M12.glob("**/*.nii.mgz"))),
+    #         sorted(list(X_M06.glob("**/*.nii.mgz"))),
+    #         sorted(list(X_SC.glob("**/*.nii.mgz"))),
+    #     )
+    #     X = []
+    #     for m12, m06, sc in zip(X_M12_files, X_M06_files, X_SC_files):
+    #         X.append([m12, m06, sc])
 
     # max_x, max_y, max_z = 0, 0, 0
-    loadnifti = LoadNifti()
+    # loadnifti = LoadNifti()
     # for y_path in y:
     # for x in X[:5]:
     #     m12 = MGHImage.load(x).get_fdata()
@@ -76,11 +90,11 @@ if __name__ == "__main__":
     #         print(f"m12 {p}%: {np.percentile(m12, p)}")
 
     # fig, axes = plt.subplots(nrows=5, ncols=1)
-    for i, y_path in enumerate(y[:5]):
-        img, compatible_meta = loadnifti(y_path)
-        mask = img != 0.0
-        print(f"min : {np.min(img[mask])}")
-        # X_transform = get_train_img_transforms()
+    # for i, y_path in enumerate(y[:5]):
+    #     img, compatible_meta = loadnifti(y_path)
+    #     mask = img != 0.0
+    #     print(f"min : {np.min(img[mask])}")
+    # X_transform = get_train_img_transforms()
     #     t1 = apply_transform(X_transform, img)
     #     t1 = t1[t1 != 0.0]
     #     sns.distplot(t1, kde=True, ax=axes[i])
