@@ -46,8 +46,6 @@ class LitModelDiffusion(pl.LightningModule):
 
     def training_step(self, batch, batch_idx: int):
         inputs, targets = batch
-        print(f"inputs tensor shape: {inputs.shape}")
-        print(f"targets tensor shape: {targets.shape}")
 
         logits = self(inputs)
         targets = self.sigmoid(targets)

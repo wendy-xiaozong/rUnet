@@ -1,8 +1,6 @@
 from monai.transforms import LoadNifti, apply_transform
 from utils.const import DIFFUSION_INPUT, DIFFUSION_LABEL, DATA_ROOT, ADNI_LIST
-from utils.transforms import get_diffusion_preprocess
 from nibabel.freesurfer.mghformat import MGHImage
-from utils.transforms import get_train_img_transforms, get_val_img_transforms, get_label_transforms
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,13 +21,15 @@ if __name__ == "__main__":
     Y_transform = get_diffusion_label_preprocess()
     for idx, (x_path, y_path) in enumerate(zip(X, y)):
         x_img, compatible_meta = loadnifti(x_path)
+        print(f"before x_img shape:{x_img.shape}")
         x_img = apply_transform(X_transform, x_img).numpy()
-        print(f"x_img shape: {x_img.shape}")
+        print(f"after x_img shape: {x_img.shape}")
 
         y_img, compatible_meta = loadnifti(y_path)
         y_img = apply_transform(Y_transform, y_img).numpy()
         print(f"processed No. {idx} image.")
         np.savez(f"{idx}.npz", X=x_img, y=y_img)
+        break
 
     # X_img, compatible_meta = loadnifti("/home/jq/Desktop/rUnet/data/ADNI/v1to2.mgz")
     # print(f"X shape: {X_img.shape}")

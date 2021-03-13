@@ -1,5 +1,6 @@
 import functools
 import os
+import torch
 from pathlib import Path
 
 from monai import transforms
@@ -19,24 +20,19 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class DiffusionDataset(Dataset):
-    def __init__(self, X_path: List[str], y_path: List[str], X_transform: Compose):
-        self.X_path = X_path
-        self.y_path = y_path
+    def __init__(self, path: List[str], X_transform: Compose):
+        self.path = path
         self.X_transform = X_transform
         self.y_transform = get_diffusion_label_preprocess()
 
     def __len__(self):
-        return int(len(self.X_path))
+        return int(len(self.path))
 
     def __getitem__(self, i):
-        loadnifti = LoadNifti()
-        X_img, compatible_meta = loadnifti(self.X_path[i])
-        y_img, compatible_meta = loadnifti(self.y_path[i])
+        tmp = np.load(self.path[i])
+        X_img, y_img = tmp["X"], tmp["y"]
 
-        X_img = apply_transform(self.X_transform, X_img)
-        y_img = apply_transform(self.y_transform, y_img)
-
-        return X_img, y_img
+        return torch.from_numpy(X_img).float(), torch.from_numpy(y_img).float()
 
 
 class DataModuleDiffusion(pl.LightningDataModule):
@@ -46,8 +42,7 @@ class DataModuleDiffusion(pl.LightningDataModule):
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
-        X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
-        y = sorted(list(DIFFUSION_LABEL.glob("**/*.nii")))
+        X = sorted(list(DIFFUSION_INPUT.glob("**/*.npz")))
 
         # train_transforms = get_train_img_transforms()
         # val_transforms = get_val_img_transforms()
@@ -56,8 +51,8 @@ class DataModuleDiffusion(pl.LightningDataModule):
         # self.train_dataset = DiffusionDataset(X_path=X[:-1] * 200, y_path=y[:-1] * 200, transform=preprocess)
         # self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, transform=preprocess)
 
-        self.train_dataset = DiffusionDataset(X_path=X, y_path=y, X_transform=preprocess)
-        self.val_dataset = DiffusionDataset(X_path=[X[-1]] * 4, y_path=[y[-1]] * 4, X_transform=preprocess)
+        self.train_dataset = DiffusionDataset(path=X[:-1] * 200, X_transform=preprocess)
+        self.val_dataset = DiffusionDataset(path=X[-1], X_transform=preprocess)
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")

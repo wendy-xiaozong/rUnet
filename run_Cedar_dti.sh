@@ -30,7 +30,7 @@ cd $SLURM_TMPDIR
 mkdir work
 echo "$(date +"%T"):  Copying data"
 # tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/BraTS/BraTS_18-20.tar -C work && echo "$(date +"%T"):  Copied data"
-tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work && echo "$(date +"%T"):  Copied data"
+tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar -C work && echo "$(date +"%T"):  Copied data"
 
 cd work
 

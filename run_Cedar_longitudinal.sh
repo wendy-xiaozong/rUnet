@@ -71,7 +71,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
-       --use_flair \
-      --fast_dev_run \
-      --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
+#        --use_flair \
+#       --fast_dev_run \
+#       --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
 # tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz

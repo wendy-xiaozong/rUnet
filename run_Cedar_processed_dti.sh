@@ -34,5 +34,4 @@ tar -xf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/diffusion.tar -C work &&
 cd work
 
 python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/load_images.py &&
-tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz
-
+tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 0.npz 1.npz 2.npz 3.npz 4.npz
