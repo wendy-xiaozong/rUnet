@@ -22,7 +22,7 @@ CUDA_LAUNCH_BLOCKING=1
 #virtualenv --no-download $SLURM_TMPDIR/env
 #source $SLURM_TMPDIR/env/bin/activate && echo "$(date +"%T"):  Activated python virtualenv"
 #pip install -r $SOURCEDIR/requirements.txt && echo "$(date +"%T"):  install successfully!"
-source /home/jueqi/projects/def-jlevman/jueqi/ENV/bin/activate && echo "$(date +"%T"):  Activated python virtualenv"
+source ~/ENV/bin/activate && echo "$(date +"%T"):  Activated python virtualenv"
 
 echo -e '\n'
 cd $SLURM_TMPDIR
