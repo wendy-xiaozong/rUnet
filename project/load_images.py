@@ -23,12 +23,11 @@ if __name__ == "__main__":
     Y_transform = get_diffusion_label_preprocess()
     for idx, (x_path, y_path) in enumerate(zip(X, y)):
         x_img, compatible_meta = loadnifti(x_path)
-        x_img = apply_transform(X_transform, x_img)
-        print(f"x_img taken memory size: {x_img.nbytes / 1024 ** 2} GB")
+        x_img = apply_transform(X_transform, x_img).numpy()
         print(f"x_img shape: {x_img.shape}")
 
         y_img, compatible_meta = loadnifti(y_path)
-        y_img = apply_transform(Y_transform, y_img)
+        y_img = apply_transform(Y_transform, y_img).numpy()
         print(f"processed No. {idx} image.")
         np.savez(f"{idx}.npz", X=x_img, y=y_img)
 
