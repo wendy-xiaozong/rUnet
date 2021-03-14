@@ -33,6 +33,7 @@ class DiffusionDataset(Dataset):
     def __getitem__(self, i):
         tmp = np.load(self.path[i])
         X_img, y_img = tmp["X"], tmp["y"]
+        print(f"get one image!")
 
         return torch.from_numpy(X_img).float(), torch.from_numpy(y_img).float()
 

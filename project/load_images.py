@@ -13,26 +13,8 @@ from utils.cropping import crop_to_nonzero
 # NUM = 1
 
 if __name__ == "__main__":
-    X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
-    y = sorted(list(DIFFUSION_LABEL.glob("**/*.nii")))
-
-    loadnifti = LoadNifti()
-    X_transform = get_diffusion_preprocess()
-    Y_transform = get_diffusion_label_preprocess()
-    for idx, (x_path, y_path) in enumerate(zip(X, y)):
-        x_img, compatible_meta = loadnifti(x_path)
-        print(f"before x_img shape:{x_img.shape}")
-        x_img = apply_transform(X_transform, x_img).numpy()
-        print(f"after x_img shape: {x_img.shape}")
-
-        y_img, compatible_meta = loadnifti(y_path)
-        y_img = apply_transform(Y_transform, y_img).numpy()
-        print(f"processed No. {idx} image.")
-        np.savez(f"{idx}.npz", X=x_img, y=y_img)
-
     # X_img, compatible_meta = loadnifti("/home/jq/Desktop/rUnet/data/ADNI/v1to2.mgz")
     # print(f"X shape: {X_img.shape}")
-    # preprocess = get_diffusion_preprocess()
 
     # X_img = apply_transform(preprocess, X_img)
 
@@ -120,3 +102,20 @@ if __name__ == "__main__":
     # print(f"max x: {max_x}")
     # print(f"max y: {max_y}")
     # print(f"max z: {max_z}")
+
+    X = sorted(list(DIFFUSION_INPUT.glob("**/*.nii")))
+    y = sorted(list(DIFFUSION_LABEL.glob("**/*.nii")))
+
+    loadnifti = LoadNifti()
+    X_transform = get_diffusion_preprocess()
+    Y_transform = get_diffusion_label_preprocess()
+    for idx, (x_path, y_path) in enumerate(zip(X, y)):
+        x_img, compatible_meta = loadnifti(x_path)
+        print(f"before x_img shape:{x_img.shape}")
+        x_img = apply_transform(X_transform, x_img).numpy()
+        print(f"after x_img shape: {x_img.shape}")
+
+        y_img, compatible_meta = loadnifti(y_path)
+        y_img = apply_transform(Y_transform, y_img).numpy()
+        print(f"processed No. {idx} image.")
+        np.savez(f"{idx}.npz", X=x_img, y=y_img)
