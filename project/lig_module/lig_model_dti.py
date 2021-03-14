@@ -48,15 +48,15 @@ class LitModelDiffusion(pl.LightningModule):
         logits = self(inputs)
         targets = self.sigmoid(targets)
         loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        if self.current_epoch % 25 == 0 and batch_idx == 0:
-            log_all_info(
-                module=self,
-                target=targets[0],
-                preb=logits[0],
-                loss=loss,
-                batch_idx=batch_idx,
-                state="train",
-            )
+        # if self.current_epoch % 25 == 0 and batch_idx == 0:
+        log_all_info(
+            module=self,
+            target=targets[0],
+            preb=logits[0],
+            loss=loss,
+            batch_idx=batch_idx,
+            state="train",
+        )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         return {"loss": loss}
 
