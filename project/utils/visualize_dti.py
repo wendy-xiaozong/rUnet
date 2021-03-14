@@ -87,18 +87,19 @@ class BrainSlices:
     def plot(self) -> Figure:
         nrows, ncols = 2, 3
 
-        fig = plt.figure(figsize=(10, 5))
+        fig = plt.figure(figsize=(10, 7))
         gs = gridspec.GridSpec(nrows, ncols)
         for i in range(0, nrows):
-            ax1 = plt.subplot(gs[i * 2])
-            ax2 = plt.subplot(gs[i * 2 + 1])
-            axes = ax1, ax2
+            ax1 = plt.subplot(gs[i * 3])
+            ax2 = plt.subplot(gs[i * 3 + 1])
+            ax3 = plt.subplot(gs[i * 3 + 2])
+            axes = ax1, ax2, ax3
             self.plot_row(self.slices[i], axes)
 
         plt.tight_layout()
         return fig
 
-    def plot_row(self, slices: List, axes: Tuple[Any, Any]) -> None:
+    def plot_row(self, slices: List, axes: Tuple[Any, Any, Any]) -> None:
         for (slice_, axis) in zip(slices, axes):
             imgs = [img for img in slice_]
             imgs = np.concatenate(imgs, axis=1)
