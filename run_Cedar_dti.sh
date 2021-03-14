@@ -42,6 +42,8 @@ ACTIVATION=LeakyReLU # LeakyReLU ReLU
 NORMALIZATION=Batch # Batch Group InstanceNorm3d
 WEIGHT_DECAY=1e-8
 IN_CHANNELS=288
+CLIP_MIN=2
+CLIP_MAX=4
 X_image=t1
 y_image=t2
 LEARNING_RATE=1e-5
@@ -51,10 +53,12 @@ LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_final_result
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --loss="$LOSS" \
+       --clip_min=$CLIP_MIN \
+       --clip_max=$CLIP_MAX \
        --batch_size=$BATCH_SIZE \
        --weight_decay=$WEIGHT_DECAY \
        --activation="$ACTIVATION" \

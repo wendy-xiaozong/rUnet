@@ -35,7 +35,14 @@ class LitModelDiffusion(pl.LightningModule):
             use_bias=True,
         )
         self.sigmoid = Sigmoid()
-        self.criterion = MSELoss()
+        if self.hparams.loss == "l2":
+            self.criterion = MSELoss()
+        elif self.hparams.loss == "l1":
+            self.criterion = L1Loss()
+        elif self.hparams.loss == "smoothl1":
+            self.criterion = SmoothL1Loss()
+        self.clip_min = self.hparams.clip_min
+        self.clip_max = self.hparams.clip_max
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
@@ -48,16 +55,20 @@ class LitModelDiffusion(pl.LightningModule):
 
         logits = self(inputs)
         targets = self.sigmoid(targets)
-        loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        # if self.current_epoch % 25 == 0 and batch_idx == 0:
-        log_all_info(
-            module=self,
-            target=targets[0],
-            preb=logits[0],
-            loss=loss,
-            batch_idx=batch_idx,
-            state="train",
-        )
+        ### before ###
+        # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        ### it should be ###
+        loss = self.criterion(logits.view(-1), targets.view(-1))
+
+        if self.current_epoch % 5 == 0 and batch_idx == 0:
+            log_all_info(
+                module=self,
+                target=targets[0],
+                preb=logits[0],
+                loss=loss,
+                batch_idx=batch_idx,
+                state="train",
+            )
         self.log("train_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
         return {"loss": loss}
 
@@ -66,8 +77,12 @@ class LitModelDiffusion(pl.LightningModule):
 
         logits = self(inputs)
         targets = self.sigmoid(targets)
-        loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
-        if self.current_epoch % 25 == 0 and batch_idx == 0:
+        ### before ###
+        # loss = self.criterion(logits.view(-1), targets.view(-1)) / np.prod(inputs.shape)
+        ### it should be ###
+        loss = self.criterion(logits.view(-1), targets.view(-1))
+
+        if self.current_epoch % 5 == 0 and batch_idx == 0:
             log_all_info(
                 module=self,
                 target=targets[0],
@@ -78,8 +93,32 @@ class LitModelDiffusion(pl.LightningModule):
             )
         self.log("val_loss", loss, sync_dist=True, on_step=True, on_epoch=True)
 
+        targets = targets.cpu().detach().numpy().squeeze()
+        predicts = logits.cpu().detach().numpy().squeeze()
+
+        brain_mask = inputs == inputs[0][0][0]
+
+        pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
+        targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
+        pred_255 = np.floor(256 * (pred_clip / (self.clip_min + self.clip_max)))
+        targ_255 = np.floor(256 * (targ_clip / (self.clip_min + self.clip_max)))
+        pred_255[brain_mask] = 0
+        targ_255[brain_mask] = 0
+
+        diff_255 = np.absolute(pred_255.ravel() - targ_255.ravel())
+        mae = np.mean(diff_255)
+
+        diff_255_mask = np.absolute(pred_255[~brain_mask].ravel() - targ_255[~brain_mask].ravel())
+        mae_mask = np.mean(diff_255_mask)
+
+        return {"MAE": mae, "MAE_mask": mae_mask}
+
     def validation_epoch_end(self, validation_step_outputs):
-        self.train_log_step = random.randint(1, 500)
+        average = np.mean(validation_step_outputs[0]["MAE"])
+        self.log("val_MAE", average, sync_dist=True, on_step=False, on_epoch=True)
+
+        average = np.mean(validation_step_outputs[0]["MAE_mask"])
+        self.log("val_MAE_mask", average, sync_dist=True, on_step=False, on_epoch=True)
 
     def test_step(self, batch, batch_idx: int):
         inputs, targets = batch

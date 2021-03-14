@@ -4,8 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy import ndarray
 from utils.const import DATA_ROOT
+from pathlib import Path
+import seaborn as sns
 
-PATH = DATA_ROOT / "pred_true"
+plt.rcParams["figure.figsize"] = (8.0, 12.0)
+PATH = Path("/home/jq/Desktop/rUnet/data/Diffusion/dti_preprocessed")
 
 
 def plot_slices(
@@ -70,18 +73,27 @@ if __name__ == "__main__":
 
     # targ_slices = []
     # pred_slices = []
-    for brain in brains:
+    # for brain in brains:
+    #     data = np.load(brain)
+    #     target = data["target"]
+    #     predict = data["predict"]
+    #     mask = target != target[0][0][0]
+    #     print(f"target mask mean: {np.mean(target[mask])}")
+    # cur_targ_slices = [target[64, ...], target[:, 64, :], target[..., 64]]
+    # cur_pred_slices = [predict[64, ...], predict[:, 64, :], predict[..., 64]]
+    # targs = np.concatenate(cur_targ_slices, axis=1)
+    # preds = np.concatenate(cur_pred_slices, axis=1)
+    # targ_slices.append(targs)
+    # pred_slices.append(preds)
+
+    fig, axes = plt.subplots(nrows=5, ncols=1)
+    for idx, brain in enumerate(brains):
         data = np.load(brain)
-        target = data["target"]
-        predict = data["predict"]
-        mask = target != target[0][0][0]
-        print(f"target mask mean: {np.mean(target[mask])}")
-        # cur_targ_slices = [target[64, ...], target[:, 64, :], target[..., 64]]
-        # cur_pred_slices = [predict[64, ...], predict[:, 64, :], predict[..., 64]]
-        # targs = np.concatenate(cur_targ_slices, axis=1)
-        # preds = np.concatenate(cur_pred_slices, axis=1)
-        # targ_slices.append(targs)
-        # pred_slices.append(preds)
+        adc = data["ADC"]
+        mask = adc != 0.0
+        adc = adc[mask]
+        sns.distplot(adc, ax=axes[idx])
+    fig.savefig("dist.png")
 
     # clips = [5, 4.5, 4, 3.5, 3, 2, 1.8]
     # mae_dict = {}
