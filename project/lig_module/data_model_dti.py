@@ -48,7 +48,7 @@ class DataModuleDiffusion(pl.LightningDataModule):
         preprocess = get_diffusion_preprocess()
 
         self.train_dataset = DiffusionDataset(path=X[:-1] * 200, X_transform=preprocess)
-        self.val_dataset = DiffusionDataset(path=X[-1] * 4, X_transform=preprocess)  # *4 in order to allocate on 4 GPUs
+        self.val_dataset = DiffusionDataset(path=[X[-1] * 4], X_transform=preprocess)  # *4 in order to allocate on 4 GPUs
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")
