@@ -51,11 +51,11 @@ class DataModuleDiffusion(pl.LightningDataModule):
 
     def train_dataloader(self):
         print(f"get {len(self.train_dataset)} training 3D image!")
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=8, shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=0, shuffle=True)
 
     def val_dataloader(self):
         print(f"get {len(self.val_dataset)} validation 3D image!")
-        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=8)
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=)
 
     def test_dataloader(self):
         print(f"get {len(self.val_dataset)} validation 3D image!")

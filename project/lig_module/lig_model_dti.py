@@ -35,8 +35,6 @@ class LitModelDiffusion(pl.LightningModule):
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
-        # randomly pick one image to log
-        self.train_log_step = random.randint(1, 200)
 
     def forward(self, x: Any) -> Any:
         return self.model(x)
