@@ -24,15 +24,16 @@ class DiffusionDataset(Dataset):
         self.path = path
         self.X_transform = X_transform
         self.y_transform = get_diffusion_label_preprocess()
+        self.type = type
 
     def __len__(self):
         return int(len(self.path))
 
     def __getitem__(self, i):
         tmp = np.load(self.path[i])
-        if type == "ADC":
+        if self.type == "ADC":
             X_img, y_img = tmp["X"], tmp["ADC"]
-        elif type == "FA":
+        elif self.type == "FA":
             X_img, y_img = tmp["X"], tmp["FA"]
 
         return torch.from_numpy(X_img).float(), torch.from_numpy(y_img).float()

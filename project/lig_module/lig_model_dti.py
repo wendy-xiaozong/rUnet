@@ -20,18 +20,19 @@ class LitModelDiffusion(pl.LightningModule):
         super(LitModelDiffusion, self).__init__()
         self.hparams = hparams
         self.model = UNet(
-            in_channels=288,
+            in_channels=hparams.in_channels,
             out_classes=1,
             dimensions=3,
             padding_mode="zeros",
-            activation="ReLU",
+            activation=hparams.activation,
             conv_num_in_layer=[1, 2, 3, 3, 3],
             residual=False,
             out_channels_first_layer=16,
             kernal_size=5,
-            normalization="Batch",
+            normalization=hparams.normalization,
             downsampling_type="max",
-            use_sigmoid=True,
+            use_sigmoid=False,
+            use_bias=True,
         )
         self.sigmoid = Sigmoid()
         self.criterion = MSELoss()
@@ -104,7 +105,9 @@ class LitModelDiffusion(pl.LightningModule):
         print(f"average absolute error: {average}")
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), lr=self.hparams.learning_rate, weight_decay=self.hparams.weight_decay
+        )
         # scheduler = ReduceLROnPlateau(optimizer, threshold=1e-10)
         lr_dict = {
             "scheduler": CosineAnnealingLR(optimizer, T_max=300, eta_min=0.000001),
