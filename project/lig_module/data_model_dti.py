@@ -18,6 +18,7 @@ from utils.transforms import get_diffusion_preprocess, get_diffusion_label_prepr
 from sklearn.model_selection import train_test_split
 from monai.transforms import LoadNifti, apply_transform
 from torch.utils.data import DataLoader, Dataset
+from utils.dataloader_prefetch import DataLoaderWithPrefetch
 
 
 class DiffusionDataset(Dataset):
