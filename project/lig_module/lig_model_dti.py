@@ -96,7 +96,7 @@ class LitModelDiffusion(pl.LightningModule):
         targets = targets.cpu().detach().numpy().squeeze()
         predicts = logits.cpu().detach().numpy().squeeze()
 
-        brain_mask = inputs == inputs[0][0][0]
+        brain_mask = targets == targets[0][0][0]
 
         pred_clip = np.clip(predicts, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(predicts))
         targ_clip = np.clip(targets, -self.clip_min, self.clip_max) - min(-self.clip_min, np.min(targets))
