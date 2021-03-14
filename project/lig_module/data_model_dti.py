@@ -1,6 +1,6 @@
 import functools
 import os
-from project.utils.const import DATA_ROOT
+from utils.const import DATA_ROOT
 import torch
 from pathlib import Path
 
