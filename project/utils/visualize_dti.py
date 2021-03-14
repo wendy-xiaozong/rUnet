@@ -95,6 +95,11 @@ class BrainSlices:
             ax3 = plt.subplot(gs[i * 3 + 2])
             axes = ax1, ax2, ax3
             self.plot_row(self.slices[i], axes)
+            for axis in axes:
+                if i == 0:
+                    axis.set_title("target image")
+                else:
+                    axis.set_title("predict image")
 
         plt.tight_layout()
         return fig
