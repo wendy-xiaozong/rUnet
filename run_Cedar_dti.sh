@@ -4,7 +4,7 @@
 #SBATCH --mem=192000M  # memory
 #SBATCH --cpus-per-task=32
 #SBATCH --output=runet-%j.out  # %N for node name, %j for jobID
-#SBATCH --time=00-01:00     # time (DD-HH:MM)
+#SBATCH --time=01-00:00     # time (DD-HH:MM)
 #SBATCH --mail-user=x2019cwn@stfx.ca # used to send emailS
 #SBATCH --mail-type=ALL
 
@@ -48,7 +48,6 @@ echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
 tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
        --gpus=$GPUS \
-       --fast_dev_run \
        --in_channels=$IN_CHANNELS \
        --batch_size=$BATCH_SIZE \
        --X_image="$X_image" \
@@ -57,6 +56,6 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
-
+#       --fast_dev_run \
 #       --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
 # tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz
