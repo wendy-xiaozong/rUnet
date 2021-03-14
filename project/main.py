@@ -80,9 +80,12 @@ def main(hparams: Namespace) -> None:
             using_flair=hparams.use_flair,
             fine_tune=hparams.fine_tune,
         )
-    elif hparams.task == "diffusion":
+    elif hparams.task == "diffusion_adc":
         model = LitModelDiffusion(hparams)
-        data_module = DataModuleDiffusion(hparams.batch_size)
+        data_module = DataModuleDiffusion(hparams.batch_size, type="ADC")
+    elif hparams.task == "diffusion_fa":
+        model = LitModelDiffusion(hparams)
+        data_module = DataModuleDiffusion(hparams.batch_size, type="FA")
     elif hparams.task == "longitudinal":
         model = LitModelLongitudinal(hparams)
         data_module = DataModuleLongitudinal(hparams.batch_size, num_scan_training=hparams.in_channels)
@@ -123,7 +126,9 @@ if __name__ == "__main__":  # pragma: no cover
     parser.add_argument("--in_channels", type=int, default=3)
     parser.add_argument("--X_image", type=str, choices=["t1", "t2"], default="t1")
     parser.add_argument("--y_image", type=str, choices=["t1", "t2"], default="t2")
-    parser.add_argument("--task", type=str, choices=["t1t2", "diffusion", "longitudinal"], default="longitudinal")
+    parser.add_argument(
+        "--task", type=str, choices=["t1t2", "diffusion_adc", "diffusion_fa", "longitudinal"], default="longitudinal"
+    )
     parser.add_argument("--checkpoint_file", type=str, help="resume from checkpoint file")
     parser = LitModel.add_model_specific_args(parser)
     hparams = parser.parse_args()

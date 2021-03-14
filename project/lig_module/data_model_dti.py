@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class DiffusionDataset(Dataset):
-    def __init__(self, path: List[str], X_transform: Compose):
+    def __init__(self, path: List[str], X_transform: Compose, type: str):
         self.path = path
         self.X_transform = X_transform
         self.y_transform = get_diffusion_label_preprocess()
@@ -30,24 +30,28 @@ class DiffusionDataset(Dataset):
 
     def __getitem__(self, i):
         tmp = np.load(self.path[i])
-        X_img, y_img = tmp["X"], tmp["y"]
+        if type == "ADC":
+            X_img, y_img = tmp["X"], tmp["ADC"]
+        elif type == "FA":
+            X_img, y_img = tmp["X"], tmp["FA"]
 
         return torch.from_numpy(X_img).float(), torch.from_numpy(y_img).float()
 
 
 class DataModuleDiffusion(pl.LightningDataModule):
-    def __init__(self, batch_size: int):
+    def __init__(self, batch_size: int, type: str):
         super().__init__()
         self.batch_size = batch_size
+        self.type = type
 
     # perform on every GPU
     def setup(self, stage: Optional[str] = None) -> None:
         X = sorted(list(DATA_ROOT.glob("**/*.npz")))
         preprocess = get_diffusion_preprocess()
 
-        self.train_dataset = DiffusionDataset(path=X[:-1] * 200, X_transform=preprocess)
+        self.train_dataset = DiffusionDataset(path=X[:-1] * 200, X_transform=preprocess, type=self.type)
         self.val_dataset = DiffusionDataset(
-            path=[X[-1]] * 4, X_transform=preprocess
+            path=[X[-1]] * 4, X_transform=preprocess, type=self.type
         )  # *4 in order to allocate on 4 GPUs
 
     def train_dataloader(self):

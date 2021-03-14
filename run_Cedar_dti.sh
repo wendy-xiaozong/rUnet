@@ -36,7 +36,7 @@ cd work
 
 GPUS=4
 BATCH_SIZE=1
-TASK=diffusion   # t1t2
+TASK=diffusion_adc   # t1t2 diffusion_adc diffusion_fa
 IN_CHANNELS=288
 X_image=t1
 y_image=t2
