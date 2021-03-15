@@ -53,7 +53,7 @@ LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_final_result
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/1/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --loss="$LOSS" \
@@ -72,5 +72,5 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
 
 #        --use_flair \
 #       --fast_dev_run \
-#       --checkpoint_file="epoch=290-val_loss=4.86729e-09.ckpt" \
+#       --checkpoint_file="epoch=40-val_loss=0.00178-val_MAE=0.32242.ckpt" \
 # tar -cf /home/jueqi/projects/def-jlevman/jueqi/Data/DTI/dti_preprocessed.tar 1.npz 2.npz 3.npz 4.npz 5.npz
