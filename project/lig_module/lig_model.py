@@ -69,7 +69,7 @@ class LitModel(pl.LightningModule):
         ### it should be ###
         loss = self.criterion(logits.view(-1), targets.view(-1))
 
-        if self.current_epoch % 50 == 0 and self.current_epoch != 0 and batch_idx == 30:
+        if self.current_epoch % 75 == 0 and self.current_epoch != 0 and batch_idx == 30:
             log_all_info(
                 module=self,
                 img=inputs[0],
