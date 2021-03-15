@@ -37,7 +37,7 @@ cd work
 GPUS=4
 BATCH_SIZE=1
 LOSS=l2  # l1 l2 smoothl1
-TASK=diffusion_adc   # t1t2 diffusion_adc diffusion_fa
+TASK=diffusion_fa   # t1t2 diffusion_adc diffusion_fa
 ACTIVATION=LeakyReLU # LeakyReLU ReLU
 NORMALIZATION=Batch # Batch Group InstanceNorm3d
 WEIGHT_DECAY=1e-8
@@ -53,7 +53,7 @@ LOG_DIR=/home/jueqi/projects/def-jlevman/jueqi/rUnet_final_result
 # run script
 echo -e '\n\n\n'
 echo "$(date +"%T"):  start running model!"
-tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/3/project/main.py \
+tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/def-jlevman/jueqi/rUnet/4/project/main.py \
        --gpus=$GPUS \
        --in_channels=$IN_CHANNELS \
        --loss="$LOSS" \
@@ -66,7 +66,7 @@ tensorboard --logdir="$LOG_DIR" --host 0.0.0.0 & python3 /home/jueqi/projects/de
        --X_image="$X_image" \
        --y_image="$y_image" \
        --task="$TASK" \
-       --checkpoint_file="epoch=40-val_loss=0.00178-val_MAE=0.32242.ckpt" \
+       --checkpoint_file="epoch=35-val_loss=0.00214-val_MAE=0.50440.ckpt" \
        --learning_rate=$LEARNING_RATE \
        --tensor_board_logger="$LOG_DIR" && echo "$(date +"%T"):  Finished running!"
 
